@@ -70,17 +70,6 @@ resource "aws_iam_role_policy" "github_actions" {
           "${aws_s3_bucket.terraform_state.arn}/*"
         ]
       },
-      # Terraform state locking (DynamoDB)
-      {
-        Effect = "Allow"
-        Action = [
-          "dynamodb:GetItem",
-          "dynamodb:PutItem",
-          "dynamodb:DeleteItem",
-          "dynamodb:DescribeTable"
-        ]
-        Resource = aws_dynamodb_table.terraform_locks.arn
-      },
       {
         Effect = "Allow"
         Action = [
