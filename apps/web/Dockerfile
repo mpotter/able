@@ -23,8 +23,8 @@ COPY . .
 
 # Build Next.js app from root (for workspace support)
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV PATH="/app/node_modules/.bin:$PATH"
-RUN cd apps/web && next build
+WORKDIR /app/apps/web
+RUN bun x next build
 
 # Production image
 FROM base AS runner
