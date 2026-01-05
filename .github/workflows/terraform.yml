@@ -84,6 +84,9 @@ jobs:
       contents: read
       pull-requests: write
 
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     defaults:
       run:
         working-directory: infra/terraform/global
