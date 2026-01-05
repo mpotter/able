@@ -63,7 +63,10 @@ jobs:
           fi
 
           # Extract changelog for this version (from ## $VERSION until next ## or EOF)
-          CHANGELOG=$(awk "/^## ${VERSION}$/,/^## [0-9]/{if(/^## [0-9]/ && !/^## ${VERSION}$/)exit; print}" apps/dotco/CHANGELOG.md 2>/dev/null)
+          CHANGELOG=$(awk -v ver="$VERSION" '
+            /^## / { if (found) exit; if ($2 == ver) found=1 }
+            found { print }
+          ' apps/dotco/CHANGELOG.md)
           if [ -z "$CHANGELOG" ]; then
             CHANGELOG="Release $TAG"
           fi
