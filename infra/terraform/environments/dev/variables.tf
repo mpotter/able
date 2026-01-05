@@ -93,3 +93,9 @@ variable "anthropic_api_key" {
   type        = string
   sensitive   = true
 }
+
+variable "alarm_email" {
+  description = "Email address for CloudWatch alarm notifications"
+  type        = string
+  default     = ""
+}

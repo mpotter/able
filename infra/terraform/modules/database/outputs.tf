@@ -22,3 +22,8 @@ output "security_group_id" {
   description = "Aurora security group ID"
   value       = aws_security_group.aurora.id
 }
+
+output "cluster_identifier" {
+  description = "RDS cluster identifier (for CloudWatch metrics)"
+  value       = aws_rds_cluster.main.cluster_identifier
+}

@@ -1,0 +1,11 @@
+# Default owners for everything
+* @mpotter
+
+# Infrastructure
+/infra/ @mpotter
+
+# Applications
+/apps/ @mpotter
+
+# Packages
+/packages/ @mpotter

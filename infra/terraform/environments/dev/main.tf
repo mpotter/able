@@ -152,6 +152,19 @@ module "ecs" {
   )
 }
 
+# Monitoring
+module "monitoring" {
+  source = "../../modules/monitoring"
+
+  name_prefix             = local.name_prefix
+  alarm_email             = var.alarm_email
+  ecs_cluster_name        = module.ecs.cluster_name
+  ecs_service_name        = module.ecs.service_name
+  alb_arn_suffix          = module.loadbalancer.alb_arn_suffix
+  target_group_arn_suffix = module.loadbalancer.target_group_arn_suffix
+  db_cluster_identifier   = module.database.cluster_identifier
+}
+
 # DNS Record
 resource "aws_route53_record" "app" {
   zone_id = data.terraform_remote_state.global.outputs.route53_zone_id
