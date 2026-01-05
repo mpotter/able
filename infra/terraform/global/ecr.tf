@@ -1,6 +1,7 @@
-# ECR Repository for the web app
-resource "aws_ecr_repository" "web" {
-  name                 = "${var.project_name}-web"
+# ECR Repository for container images
+
+resource "aws_ecr_repository" "dotco" {
+  name                 = "able-dotco"
   image_tag_mutability = "MUTABLE"
 
   image_scanning_configuration {
@@ -8,13 +9,12 @@ resource "aws_ecr_repository" "web" {
   }
 
   tags = {
-    Name = "${var.project_name}-web"
+    Name = "able-dotco"
   }
 }
 
-# Lifecycle policy to clean up old images
-resource "aws_ecr_lifecycle_policy" "web" {
-  repository = aws_ecr_repository.web.name
+resource "aws_ecr_lifecycle_policy" "dotco" {
+  repository = aws_ecr_repository.dotco.name
 
   policy = jsonencode({
     rules = [
@@ -32,9 +32,4 @@ resource "aws_ecr_lifecycle_policy" "web" {
       }
     ]
   })
-}
-
-output "ecr_repository_url" {
-  value       = aws_ecr_repository.web.repository_url
-  description = "ECR repository URL for web app"
 }

@@ -1,34 +1,41 @@
+# Global Infrastructure - Shared resources across all environments
+
 terraform {
-  required_version = ">= 1.0"
+  required_version = ">= 1.10"
 
   required_providers {
     aws = {
       source  = "hashicorp/aws"
       version = "~> 6.27"
     }
+    github = {
+      source  = "integrations/github"
+      version = "~> 6.0"
+    }
   }
 
   backend "s3" {
     bucket       = "able-terraform-state-870915098538"
-    key          = "state/terraform.tfstate"
+    key          = "able/global/terraform.tfstate"
     region       = "us-east-1"
-    encrypt      = true
     use_lockfile = true
-    # profile configured via -backend-config or AWS_PROFILE env var
   }
 }
 
 provider "aws" {
   region = var.aws_region
-  # profile configured via AWS_PROFILE env var (not set in CI, uses OIDC credentials)
 
   default_tags {
     tags = {
-      Project     = var.project_name
-      Environment = var.environment
-      ManagedBy   = "terraform"
+      Project   = var.project_name
+      ManagedBy = "terraform"
+      Scope     = "global"
     }
   }
+}
+
+provider "github" {
+  owner = var.github_org
 }
 
 data "aws_caller_identity" "current" {}

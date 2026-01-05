@@ -15,39 +15,78 @@ on:
       - '.github/workflows/terraform.yml'
   workflow_dispatch:
     inputs:
-      environment:
-        description: 'Environment to plan/apply'
+      target:
+        description: 'Target to plan/apply'
         required: true
         default: 'dev'
         type: choice
         options:
+          - global
           - dev
           - prod
 
 env:
   AWS_REGION: us-east-1
-  TF_WORKING_DIR: infra/terraform
-  # Default to dev for push/PR, use input for manual dispatch
-  TF_ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
-
-concurrency:
-  group: terraform-${{ github.event.inputs.environment || 'dev' }}-${{ github.event.pull_request.number || 'main' }}
-  cancel-in-progress: false
+  TF_VERSION: "1.14"
 
 jobs:
-  plan:
-    name: Terraform Plan (${{ github.event.inputs.environment || 'dev' }})
+  detect-changes:
+    name: Detect Changes
     runs-on: ubuntu-latest
+    outputs:
+      global: ${{ steps.changes.outputs.global }}
+      dev: ${{ steps.changes.outputs.dev }}
+      prod: ${{ steps.changes.outputs.prod }}
+      modules: ${{ steps.changes.outputs.modules }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect changes
+        id: changes
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            # Manual trigger - only run specified target
+            echo "global=${{ github.event.inputs.target == 'global' }}" >> $GITHUB_OUTPUT
+            echo "dev=${{ github.event.inputs.target == 'dev' }}" >> $GITHUB_OUTPUT
+            echo "prod=${{ github.event.inputs.target == 'prod' }}" >> $GITHUB_OUTPUT
+            echo "modules=false" >> $GITHUB_OUTPUT
+          else
+            # Check for changes in each directory
+            GLOBAL_CHANGED=$(git diff --name-only HEAD~1 HEAD | grep -q "^infra/terraform/global/" && echo "true" || echo "false")
+            DEV_CHANGED=$(git diff --name-only HEAD~1 HEAD | grep -q "^infra/terraform/environments/dev/" && echo "true" || echo "false")
+            PROD_CHANGED=$(git diff --name-only HEAD~1 HEAD | grep -q "^infra/terraform/environments/prod/" && echo "true" || echo "false")
+            MODULES_CHANGED=$(git diff --name-only HEAD~1 HEAD | grep -q "^infra/terraform/modules/" && echo "true" || echo "false")
+
+            echo "global=$GLOBAL_CHANGED" >> $GITHUB_OUTPUT
+            echo "dev=$DEV_CHANGED" >> $GITHUB_OUTPUT
+            echo "prod=$PROD_CHANGED" >> $GITHUB_OUTPUT
+            echo "modules=$MODULES_CHANGED" >> $GITHUB_OUTPUT
+
+            echo "Changes detected:"
+            echo "  global: $GLOBAL_CHANGED"
+            echo "  dev: $DEV_CHANGED"
+            echo "  prod: $PROD_CHANGED"
+            echo "  modules: $MODULES_CHANGED"
+          fi
+
+  global:
+    name: Global Infrastructure
+    needs: detect-changes
+    if: needs.detect-changes.outputs.global == 'true'
+    runs-on: ubuntu-latest
+    environment: global
+
     permissions:
       id-token: write
       contents: read
       pull-requests: write
 
-    outputs:
-      has_changes: ${{ steps.plan.outputs.has_changes }}
-
-    env:
-      TF_VAR_anthropic_api_key: ${{ secrets.TF_VAR_ANTHROPIC_API_KEY }}
+    defaults:
+      run:
+        working-directory: infra/terraform/global
 
     steps:
       - name: Checkout
@@ -62,140 +101,50 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: "1.14"
-          terraform_wrapper: false  # Disable wrapper that interferes with exit codes
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
 
       - name: Terraform Init
-        working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform init
-
-      - name: Select Workspace
-        working-directory: ${{ env.TF_WORKING_DIR }}
-        run: |
-          terraform workspace select ${{ env.TF_ENVIRONMENT }} || terraform workspace new ${{ env.TF_ENVIRONMENT }}
-
-      - name: Terraform Format Check
-        working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform fmt -check -recursive
-
-      - name: Terraform Validate
-        working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform validate
 
       - name: Terraform Plan
         id: plan
-        working-directory: ${{ env.TF_WORKING_DIR }}
         shell: bash {0}
         run: |
-          # Run terraform plan - exit codes: 0=no changes, 1=error, 2=changes
           terraform plan \
-            -var-file=environments/shared.tfvars \
-            -var-file=environments/${{ env.TF_ENVIRONMENT }}.tfvars \
             -detailed-exitcode \
             -out=tfplan \
             -no-color > plan_output.txt 2>&1
           EXIT_CODE=$?
-
-          # Show plan output
           cat plan_output.txt
+          echo "exit_code=$EXIT_CODE" >> $GITHUB_OUTPUT
 
-          echo "Terraform plan exit code: $EXIT_CODE"
-
-          if [ "$EXIT_CODE" -eq 0 ]; then
-            echo "has_changes=false" >> $GITHUB_OUTPUT
-            echo "No changes detected"
-          elif [ "$EXIT_CODE" -eq 2 ]; then
-            echo "has_changes=true" >> $GITHUB_OUTPUT
-            echo "Changes detected"
-          else
-            echo "Terraform plan failed with exit code $EXIT_CODE"
-            exit $EXIT_CODE
-          fi
-
-      - name: Post Plan to PR
-        if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            const plan = fs.readFileSync('${{ env.TF_WORKING_DIR }}/plan_output.txt', 'utf8');
-            const hasChanges = '${{ steps.plan.outputs.has_changes }}' === 'true';
-            const env = '${{ env.TF_ENVIRONMENT }}';
-
-            const truncatedPlan = plan.length > 60000
-              ? plan.substring(0, 60000) + '\n\n... (truncated)'
-              : plan;
-
-            const body = `## Terraform Plan (${env}) ${hasChanges ? '⚠️ Changes Detected' : '✅ No Changes'}
-
-            <details>
-            <summary>Show Plan</summary>
-
-            \`\`\`hcl
-            ${truncatedPlan}
-            \`\`\`
-
-            </details>
-
-            ${hasChanges ? '**This PR will modify infrastructure. Review carefully.**' : ''}
-            `;
-
-            // Find existing comment
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-            });
-
-            const botComment = comments.find(c =>
-              c.user.type === 'Bot' && c.body.includes(`## Terraform Plan (${env})`)
-            );
-
-            if (botComment) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: botComment.id,
-                body: body
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body: body
-              });
-            }
-
-      - name: Check Plan Status
-        if: steps.plan.outcome == 'failure'
-        run: exit 1
-
-      - name: Upload Plan
+      - name: Terraform Apply
         if: |
-          steps.plan.outputs.has_changes == 'true' &&
-          (github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main'))
-        uses: actions/upload-artifact@v4
-        with:
-          name: tfplan-${{ env.TF_ENVIRONMENT }}
-          path: ${{ env.TF_WORKING_DIR }}/tfplan
-          retention-days: 1
+          github.event_name != 'pull_request' &&
+          steps.plan.outputs.exit_code == '2'
+        run: terraform apply -auto-approve tfplan
 
-  apply:
-    name: Terraform Apply (${{ github.event.inputs.environment || 'dev' }})
-    needs: plan
+  dev:
+    name: Dev Environment
+    needs: detect-changes
     if: |
-      needs.plan.outputs.has_changes == 'true' &&
-      (github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main'))
+      needs.detect-changes.outputs.dev == 'true' ||
+      needs.detect-changes.outputs.modules == 'true'
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment || 'dev' }}
+    environment: dev
 
     permissions:
       id-token: write
       contents: read
+      pull-requests: write
 
     env:
       TF_VAR_anthropic_api_key: ${{ secrets.TF_VAR_ANTHROPIC_API_KEY }}
+
+    defaults:
+      run:
+        working-directory: infra/terraform/environments/dev
 
     steps:
       - name: Checkout
@@ -210,23 +159,86 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: "1.14"
-          terraform_wrapper: false  # Disable wrapper that interferes with exit codes
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
 
       - name: Terraform Init
-        working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform init
 
-      - name: Select Workspace
-        working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform workspace select ${{ env.TF_ENVIRONMENT }}
-
-      - name: Download Plan
-        uses: actions/download-artifact@v4
-        with:
-          name: tfplan-${{ env.TF_ENVIRONMENT }}
-          path: ${{ env.TF_WORKING_DIR }}
+      - name: Terraform Plan
+        id: plan
+        shell: bash {0}
+        run: |
+          terraform plan \
+            -detailed-exitcode \
+            -out=tfplan \
+            -no-color > plan_output.txt 2>&1
+          EXIT_CODE=$?
+          cat plan_output.txt
+          echo "exit_code=$EXIT_CODE" >> $GITHUB_OUTPUT
 
       - name: Terraform Apply
-        working-directory: ${{ env.TF_WORKING_DIR }}
+        if: |
+          github.event_name != 'pull_request' &&
+          steps.plan.outputs.exit_code == '2'
+        run: terraform apply -auto-approve tfplan
+
+  prod:
+    name: Prod Environment
+    needs: [detect-changes, dev]
+    if: |
+      always() &&
+      (needs.detect-changes.outputs.prod == 'true' ||
+       needs.detect-changes.outputs.modules == 'true') &&
+      (needs.dev.result == 'success' || needs.dev.result == 'skipped')
+    runs-on: ubuntu-latest
+    environment: prod
+
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+
+    env:
+      TF_VAR_anthropic_api_key: ${{ secrets.TF_VAR_ANTHROPIC_API_KEY }}
+
+    defaults:
+      run:
+        working-directory: infra/terraform/environments/prod
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        id: plan
+        shell: bash {0}
+        run: |
+          terraform plan \
+            -detailed-exitcode \
+            -out=tfplan \
+            -no-color > plan_output.txt 2>&1
+          EXIT_CODE=$?
+          cat plan_output.txt
+          echo "exit_code=$EXIT_CODE" >> $GITHUB_OUTPUT
+
+      - name: Terraform Apply
+        if: |
+          github.event_name != 'pull_request' &&
+          steps.plan.outputs.exit_code == '2'
         run: terraform apply -auto-approve tfplan
