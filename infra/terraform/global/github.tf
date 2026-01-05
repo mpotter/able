@@ -67,11 +67,12 @@ resource "github_branch_protection" "main" {
   repository_id = var.github_repo
   pattern       = "main"
 
-  # Require PR with at least 1 approval
+  # Require PR with at least 1 approval (admins can bypass with enforce_admins = false)
   required_pull_request_reviews {
     required_approving_review_count = 1
     dismiss_stale_reviews           = true
     require_code_owner_reviews      = false
+    require_last_push_approval      = false  # Allow last pusher to approve
   }
 
   # Require status checks to pass
