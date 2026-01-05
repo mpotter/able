@@ -7,46 +7,62 @@
     button { padding: 12px 24px; font-size: 16px; cursor: pointer; background: #238636; color: white; border: none; border-radius: 6px; }
     button:hover { background: #2ea043; }
     pre { background: #f6f8fa; padding: 16px; border-radius: 6px; overflow-x: auto; }
+    code { background: #f6f8fa; padding: 2px 6px; border-radius: 3px; }
   </style>
 </head>
 <body>
   <h1>Create Able Terraform GitHub App</h1>
   <p>Click the button below to create the GitHub App with the correct permissions.</p>
 
-  <form action="https://github.com/settings/apps/new?state=able" method="post">
-    <input type="hidden" name="manifest" value='{
-  "name": "Able Terraform",
-  "description": "GitHub App for Able infrastructure management via Terraform",
-  "url": "https://github.com/mpotter/able",
-  "redirect_url": "https://github.com/mpotter/able",
-  "callback_urls": ["https://github.com/mpotter/able"],
-  "setup_url": "https://github.com/mpotter/able",
-  "hook_attributes": {"active": false},
-  "public": false,
-  "default_permissions": {
-    "administration": "write",
-    "contents": "read",
-    "environments": "write",
-    "metadata": "read",
-    "pull_requests": "write",
-    "actions": "write"
-  },
-  "default_events": []
-}'>
-    <button type="submit">Create GitHub App</button>
-  </form>
+  <button onclick="createApp()">Create GitHub App</button>
+
+  <script>
+    function createApp() {
+      const manifest = {
+        name: "Able Terraform",
+        description: "GitHub App for Able infrastructure management via Terraform",
+        url: "https://github.com/mpotter/able",
+        redirect_url: "https://github.com/mpotter/able",
+        hook_attributes: { active: false },
+        public: false,
+        default_permissions: {
+          administration: "write",
+          contents: "read",
+          environments: "write",
+          metadata: "read",
+          pull_requests: "write",
+          actions: "write"
+        },
+        default_events: []
+      };
+
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = 'https://github.com/settings/apps/new';
+
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'manifest';
+      input.value = JSON.stringify(manifest);
+
+      form.appendChild(input);
+      document.body.appendChild(form);
+      form.submit();
+    }
+  </script>
 
   <h2>After creating:</h2>
   <ol>
-    <li>Click "Install App" and select the <code>able</code> repository</li>
-    <li>Go to the App's settings and note the <strong>App ID</strong></li>
-    <li>Scroll down and click "Generate a private key" (downloads a .pem file)</li>
+    <li>Click <strong>"Install App"</strong> and select the <code>able</code> repository</li>
+    <li>Go to the App's settings and note the <strong>App ID</strong> (shown near the top)</li>
+    <li>Scroll down and click <strong>"Generate a private key"</strong> (downloads a .pem file)</li>
     <li>Set the secrets:
       <pre>gh secret set GH_APP_ID
-# Enter the App ID
+# Enter the App ID when prompted
 
 gh secret set GH_APP_PRIVATE_KEY &lt; ~/Downloads/able-terraform.*.pem</pre>
     </li>
+    <li>Re-run <code>./scripts/setup.sh</code> to verify</li>
   </ol>
 </body>
 </html>
