@@ -52,7 +52,7 @@ jobs:
 
       - name: Terraform Init
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform init -backend-config="profile="
+        run: terraform init
 
       - name: Terraform Format Check
         working-directory: ${{ env.TF_WORKING_DIR }}
@@ -172,7 +172,7 @@ jobs:
 
       - name: Terraform Init
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform init -backend-config="profile="
+        run: terraform init
 
       - name: Download Plan
         uses: actions/download-artifact@v4

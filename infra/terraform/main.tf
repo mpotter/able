@@ -14,13 +14,13 @@ terraform {
     region       = "us-east-1"
     encrypt      = true
     use_lockfile = true
-    profile      = "able"
+    # profile configured via -backend-config or AWS_PROFILE env var
   }
 }
 
 provider "aws" {
-  region  = var.aws_region
-  profile = var.aws_profile
+  region = var.aws_region
+  # profile configured via AWS_PROFILE env var (not set in CI, uses OIDC credentials)
 
   default_tags {
     tags = {
