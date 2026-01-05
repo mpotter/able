@@ -96,22 +96,33 @@ echo "========================================="
 if [ $ERRORS -gt 0 ]; then
   echo -e "${RED}Setup incomplete: $ERRORS error(s), $WARNINGS warning(s)${NC}"
   echo ""
-  echo "To fix missing GitHub App secrets:"
-  echo ""
-  echo "1. Create the GitHub App:"
-  echo "   Visit: https://github.com/settings/apps/new"
-  echo "   Or use manifest: https://github.com/settings/apps/new?manifest=$(cat scripts/github-app-manifest.json | jq -c | jq -sRr @uri)"
-  echo ""
-  echo "2. After creating, install it on the 'able' repository"
-  echo ""
-  echo "3. Note the App ID from the app's settings page"
-  echo ""
-  echo "4. Generate a private key and download it"
-  echo ""
-  echo "5. Set the secrets:"
-  echo "   gh secret set GH_APP_ID"
-  echo "   gh secret set GH_APP_PRIVATE_KEY < path/to/private-key.pem"
-  echo ""
+  # Check if GitHub App secrets are the issue
+  if ! check_secret "GH_APP_ID" 2>/dev/null || ! check_secret "GH_APP_PRIVATE_KEY" 2>/dev/null; then
+    echo ""
+    echo "GitHub App not configured. Opening browser to create it..."
+    echo ""
+
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+    # Open the HTML form in default browser
+    if command -v open &> /dev/null; then
+      open "$SCRIPT_DIR/create-github-app.html"
+    elif command -v xdg-open &> /dev/null; then
+      xdg-open "$SCRIPT_DIR/create-github-app.html"
+    else
+      echo "Please open scripts/create-github-app.html in your browser"
+    fi
+
+    echo "After creating the app:"
+    echo "1. Install it on the 'able' repository"
+    echo "2. Note the App ID from the app's settings"
+    echo "3. Generate a private key (downloads .pem)"
+    echo "4. Run:"
+    echo "   gh secret set GH_APP_ID"
+    echo "   gh secret set GH_APP_PRIVATE_KEY < ~/Downloads/able-terraform.*.pem"
+    echo ""
+    echo "Then re-run this script to verify."
+  fi
   exit 1
 else
   echo -e "${GREEN}Setup complete!${NC}"
