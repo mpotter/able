@@ -148,6 +148,7 @@ jobs:
 
     env:
       TF_VAR_anthropic_api_key: ${{ secrets.TF_VAR_ANTHROPIC_API_KEY }}
+      TF_VAR_alarm_email: ${{ vars.ALARM_EMAIL }}
 
     defaults:
       run:
@@ -212,6 +213,7 @@ jobs:
 
     env:
       TF_VAR_anthropic_api_key: ${{ secrets.TF_VAR_ANTHROPIC_API_KEY }}
+      TF_VAR_alarm_email: ${{ vars.ALARM_EMAIL }}
 
     defaults:
       run:
