@@ -1,17 +1,16 @@
 # Able
 
-Monorepo for Able - we accelerate AI automation.
+We accelerate AI automation.
 
-See [content/PUBLIC.md](content/PUBLIC.md) for more about what we do.
-
-## Getting Started
+## Local Development
 
 ```bash
 # Install dependencies
 bun install
 
-# Run setup to validate environment
-./scripts/setup.sh
+# Copy environment template
+cp apps/dotco/.env.example apps/dotco/.env.local
+# Edit .env.local with your ANTHROPIC_API_KEY and DATABASE_URL
 
 # Start development
 bun run dev
@@ -31,5 +30,5 @@ able/
 
 ## Documentation
 
-- [docs/SETUP.md](docs/SETUP.md) - Environment setup
 - [CLAUDE.md](CLAUDE.md) - Development guidelines
+- [docs/INFRA.md](docs/INFRA.md) - Infrastructure setup (AWS, Terraform, CI)

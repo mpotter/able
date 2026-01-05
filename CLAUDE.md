@@ -16,9 +16,9 @@ able/
 
 ## Setup
 
-Run `./scripts/setup.sh` to validate and configure the environment. See [docs/SETUP.md](docs/SETUP.md) for details.
+**Local development**: `bun install` then copy `.env.example` to `.env.local` with your keys.
 
-**Note**: Any new setup requirements should be added to `scripts/setup.sh` to keep configuration automated and documented.
+**Infrastructure**: Run `./scripts/infra-setup.sh` to validate AWS/GitHub/Terraform. See [docs/INFRA.md](docs/INFRA.md).
 
 ## Commands
 

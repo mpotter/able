@@ -1,20 +1,20 @@
-# Setup Guide
+# Infrastructure Setup
 
-This guide walks through setting up the Able infrastructure from scratch.
+This guide covers AWS and CI/CD infrastructure setup. For local development, see the [README](../README.md).
 
 ## Prerequisites
 
-- [Bun](https://bun.sh) - JavaScript runtime
 - [Terraform](https://terraform.io) - Infrastructure as code
 - [AWS CLI](https://aws.amazon.com/cli/) - AWS command line
 - [GitHub CLI](https://cli.github.com) - GitHub command line
+- [Bun](https://bun.sh) - Required for GitHub App creation script
 
 ## Quick Start
 
-Run the setup script to validate dependencies and configure secrets:
+Run the infrastructure setup script to validate dependencies and configure secrets:
 
 ```bash
-./scripts/setup.sh
+./scripts/infra-setup.sh
 ```
 
 The script will:
