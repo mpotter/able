@@ -8,4 +8,4 @@ github_org         = "mpotter"
 github_repo        = "able"
 create_github_oidc = true
 
-domain_name        = "getwafer.com"
+domain_name = "getwafer.com"

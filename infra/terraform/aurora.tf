@@ -44,8 +44,8 @@ resource "aws_rds_cluster" "main" {
   engine_version     = "16.4"
   database_name      = "able"
 
-  master_username                     = var.db_master_username
-  manage_master_user_password         = true # AWS manages password in Secrets Manager
+  master_username             = var.db_master_username
+  manage_master_user_password = true # AWS manages password in Secrets Manager
 
   db_subnet_group_name   = aws_db_subnet_group.aurora.name
   vpc_security_group_ids = [aws_security_group.aurora.id]
