@@ -312,6 +312,18 @@ resource "aws_iam_role_policy" "github_actions" {
           "kms:GenerateDataKey"
         ]
         Resource = "*"
+      },
+      # AWS Budgets
+      {
+        Effect = "Allow"
+        Action = [
+          "budgets:ViewBudget",
+          "budgets:ModifyBudget",
+          "budgets:CreateBudgetAction",
+          "budgets:DeleteBudgetAction",
+          "budgets:UpdateBudgetAction"
+        ]
+        Resource = "arn:aws:budgets::${data.aws_caller_identity.current.account_id}:budget/${var.project_name}-*"
       }
     ]
   })

@@ -27,3 +27,15 @@ variable "github_repo" {
   type        = string
   default     = "able"
 }
+
+variable "monthly_budget_limit" {
+  description = "Monthly budget limit in USD"
+  type        = number
+  default     = 100
+}
+
+variable "budget_alert_email" {
+  description = "Email for budget alerts"
+  type        = string
+  default     = ""
+}

@@ -86,6 +86,7 @@ jobs:
 
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      TF_VAR_budget_alert_email: ${{ vars.ALARM_EMAIL }}
 
     defaults:
       run:
