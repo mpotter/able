@@ -15,7 +15,11 @@ COPY packages/db/package.json ./packages/db/
 COPY packages/ui/package.json ./packages/ui/
 COPY packages/config/package.json ./packages/config/
 
-RUN bun install --frozen-lockfile
+RUN bun install --frozen-lockfile && \
+    echo "=== node_modules contents ===" && \
+    ls node_modules/ | head -20 && \
+    echo "=== .bin contents ===" && \
+    ls -la node_modules/.bin/ 2>/dev/null || echo "No .bin"
 
 # Build the application
 FROM base AS builder
