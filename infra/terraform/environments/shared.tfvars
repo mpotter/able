@@ -6,7 +6,7 @@ domain_name  = "getwafer.com"
 # GitHub OIDC (shared, only created once)
 github_org         = "mpotter"
 github_repo        = "able"
-create_github_oidc = false  # Already exists
+create_github_oidc = false # Already exists
 
 # Database
 db_master_username = "able_admin"
