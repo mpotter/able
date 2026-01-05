@@ -2,4 +2,4 @@
 "@able/dotco": patch
 ---
 
-Fix Docker health checks by installing curl in the container image
+Switch to ALB health check instead of container health check for more reliable deployments

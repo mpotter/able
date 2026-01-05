@@ -150,13 +150,8 @@ resource "aws_ecs_task_definition" "main" {
       }
     }
 
-    healthCheck = {
-      command     = ["CMD-SHELL", "curl -f http://localhost:${var.container_port}${var.health_check_path} || exit 1"]
-      interval    = 30
-      timeout     = 5
-      retries     = 3
-      startPeriod = 60
-    }
+    # No container health check - rely on ALB target group health check instead
+    # This avoids needing curl in the container and is more realistic (checks from outside)
   }])
 
   tags = {

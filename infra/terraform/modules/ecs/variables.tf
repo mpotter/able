@@ -93,8 +93,4 @@ variable "secrets_arns" {
   default     = []
 }
 
-variable "health_check_path" {
-  description = "Health check path"
-  type        = string
-  default     = "/api/health"
-}
+# Note: Container health check removed - using ALB target group health check instead

@@ -132,7 +132,6 @@ module "ecs" {
   cpu                   = var.ecs_cpu
   memory                = var.ecs_memory
   desired_count         = var.ecs_desired_count
-  health_check_path     = var.health_check_path
 
   environment_variables = [
     { name = "NODE_ENV", value = "production" },
