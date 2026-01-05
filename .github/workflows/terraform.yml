@@ -86,7 +86,7 @@ jobs:
       actions: write
 
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GH_PAT }}
       TF_VAR_budget_alert_email: ${{ vars.ALARM_EMAIL }}
 
     defaults:
