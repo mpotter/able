@@ -26,7 +26,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 WORKDIR /app/apps/web
 # Create symlink for node_modules so next can resolve packages
 RUN ln -s /app/node_modules ./node_modules && \
-    node /app/node_modules/next/dist/bin/next build
+    bun run --cwd /app/apps/web next build
 
 # Production image
 FROM base AS runner
