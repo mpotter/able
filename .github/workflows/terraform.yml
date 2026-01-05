@@ -172,7 +172,9 @@ jobs:
   apply:
     name: Terraform Apply (${{ github.event.inputs.environment || 'dev' }})
     needs: plan
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.plan.outputs.has_changes == 'true'
+    if: |
+      needs.plan.outputs.has_changes == 'true' &&
+      (github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main'))
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment || 'dev' }}
 
