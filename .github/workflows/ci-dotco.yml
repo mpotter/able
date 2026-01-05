@@ -59,7 +59,7 @@ jobs:
 
       - name: Type check
         working-directory: apps/dotco
-        run: bunx tsc --noEmit
+        run: bun run typecheck
 
       - name: Build
         working-directory: apps/dotco
