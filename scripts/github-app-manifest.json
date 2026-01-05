@@ -2,6 +2,9 @@
   "name": "Able Terraform",
   "description": "GitHub App for Able infrastructure management via Terraform",
   "url": "https://github.com/mpotter/able",
+  "redirect_url": "https://github.com/mpotter/able",
+  "callback_urls": ["https://github.com/mpotter/able"],
+  "setup_url": "https://github.com/mpotter/able",
   "hook_attributes": {
     "active": false
   },
