@@ -261,7 +261,13 @@ resource "aws_iam_role_policy" "github_actions" {
       {
         Effect = "Allow"
         Action = [
-          "sns:CreateTopic",
+          "sns:CreateTopic"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
           "sns:DeleteTopic",
           "sns:GetTopicAttributes",
           "sns:SetTopicAttributes",
@@ -269,7 +275,8 @@ resource "aws_iam_role_policy" "github_actions" {
           "sns:Unsubscribe",
           "sns:ListTagsForResource",
           "sns:TagResource",
-          "sns:UntagResource"
+          "sns:UntagResource",
+          "sns:ListSubscriptionsByTopic"
         ]
         Resource = "arn:aws:sns:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:${var.project_name}-*"
       },
