@@ -1,7 +1,7 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
-import { TextStreamChatTransport } from "ai";
+import { DefaultChatTransport } from "ai";
 import { useRef, useEffect, useState, useCallback } from "react";
 import { introMessages, introConfig } from "@/content/intro";
 
@@ -38,7 +38,7 @@ export function ChatHome() {
 
   const { messages, sendMessage, status } =
     useChat({
-      transport: new TextStreamChatTransport({ api: "/api/chat" }),
+      transport: new DefaultChatTransport({ api: "/api/chat" }),
     });
 
   const isLoading = status === "submitted" || status === "streaming";
