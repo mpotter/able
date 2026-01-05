@@ -12,19 +12,13 @@
 
 const manifest = {
   name: "Able Terraform",
-  description: "GitHub App for Able infrastructure management via Terraform",
   url: "https://github.com/mpotter/able",
-  hook_attributes: { active: false },
   public: false,
   default_permissions: {
     administration: "write",
     contents: "read",
-    environments: "write",
     metadata: "read",
-    pull_requests: "write",
-    actions: "write",
   },
-  default_events: [],
 };
 
 const PORT = 8374;
