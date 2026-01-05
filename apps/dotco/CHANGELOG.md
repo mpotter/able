@@ -1,5 +1,11 @@
 # @able/dotco
 
+## 0.0.5
+
+### Patch Changes
+
+- [#22](https://github.com/mpotter/able/pull/22) [`a677814`](https://github.com/mpotter/able/commit/a677814342d69ea52a88aa341cbfcf042c64cf9b) Thanks [@mpotter](https://github.com/mpotter)! - Fix suggestion buttons to submit immediately on click instead of just filling the input field
+
 ## 0.0.4
 
 ### Patch Changes
