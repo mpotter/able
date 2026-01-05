@@ -76,6 +76,6 @@ resource "github_branch_protection" "main" {
   allows_force_pushes = false
   allows_deletions    = false
 
-  # Enforce rules for admins too
-  enforce_admins = true
+  # Allow admins to bypass (needed for solo maintainer workflow)
+  enforce_admins = false
 }

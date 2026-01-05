@@ -24,6 +24,8 @@ jobs:
   lint-and-build:
     name: Lint and Build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Allow pushing lockfile updates for dependabot
 
     steps:
       - name: Checkout
