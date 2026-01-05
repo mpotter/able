@@ -27,6 +27,37 @@ able/
 - **Infrastructure**: AWS (ECS Fargate, Aurora PostgreSQL, ALB, Route53)
 - **IaC**: Terraform
 
+## Initial Setup
+
+Run the setup script to validate all dependencies:
+```bash
+./scripts/setup.sh
+```
+
+### Required Configuration
+
+1. **AWS Profile**: Configure `able` profile in `~/.aws/credentials`
+
+2. **GitHub App** (for terraform to manage repo settings):
+   - Create app at https://github.com/settings/apps/new using `scripts/github-app-manifest.json`
+   - Install on the `able` repository
+   - Set secrets:
+     ```bash
+     gh secret set GH_APP_ID        # App ID from settings page
+     gh secret set GH_APP_PRIVATE_KEY < private-key.pem
+     ```
+
+3. **Other Secrets**:
+   ```bash
+   gh secret set AWS_ROLE_ARN              # arn:aws:iam::ACCOUNT:role/able-github-actions
+   gh secret set TF_VAR_ANTHROPIC_API_KEY  # Anthropic API key
+   ```
+
+4. **Optional Variables**:
+   ```bash
+   gh variable set ALARM_EMAIL  # Email for CloudWatch/Budget alerts
+   ```
+
 ## Commands
 
 ### Development
