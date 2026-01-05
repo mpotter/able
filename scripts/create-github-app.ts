@@ -17,7 +17,10 @@ const manifest = {
   default_permissions: {
     administration: "write",
     contents: "read",
+    environments: "write",
     metadata: "read",
+    pull_requests: "write",
+    actions: "write",
   },
 };
 
@@ -33,20 +36,25 @@ console.log("Manifest being sent:");
 console.log(JSON.stringify(fullManifest, null, 2));
 console.log("");
 
-// Build the GitHub URL with manifest as query parameter
-const githubUrl = `https://github.com/settings/apps/new?manifest=${encodeURIComponent(manifestJson)}`;
+// Generate a random state for security
+const state = Math.random().toString(36).substring(2, 15);
 
-// Simple redirect page
+// POST form that auto-submits - this is the correct way per GitHub docs
 const formHtml = `
 <!DOCTYPE html>
 <html>
 <head>
   <title>Creating GitHub App...</title>
-  <meta http-equiv="refresh" content="0;url=${githubUrl.replace(/"/g, '&quot;')}">
 </head>
 <body>
   <p>Redirecting to GitHub...</p>
-  <p><a href="${githubUrl.replace(/"/g, '&quot;')}">Click here if not redirected</a></p>
+  <form id="manifest-form" action="https://github.com/settings/apps/new?state=${state}" method="post">
+    <input type="hidden" name="manifest" id="manifest">
+  </form>
+  <script>
+    document.getElementById('manifest').value = JSON.stringify(${manifestJson});
+    document.getElementById('manifest-form').submit();
+  </script>
 </body>
 </html>
 `;
