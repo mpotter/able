@@ -84,27 +84,24 @@ jobs:
       - name: Terraform Plan
         id: plan
         working-directory: ${{ env.TF_WORKING_DIR }}
+        shell: bash
         run: |
-          # Run terraform plan and capture both output and exit code
+          set +o pipefail  # Allow pipeline to continue even if terraform exits non-zero
+          set +e  # Disable errexit to allow capturing non-zero exit codes
           terraform plan \
             -var-file=environments/shared.tfvars \
             -var-file=environments/${{ env.TF_ENVIRONMENT }}.tfvars \
             -detailed-exitcode \
             -out=tfplan \
-            -no-color > plan_output.txt 2>&1 || EXIT_CODE=$?
-
-          # Default to 0 if not set (plan succeeded with no changes)
-          EXIT_CODE=${EXIT_CODE:-0}
-
-          # Show plan output
-          cat plan_output.txt
+            -no-color 2>&1 | tee plan_output.txt; EXIT_CODE="${PIPESTATUS[0]}"
+          set -e  # Re-enable errexit
 
           echo "Terraform plan exit code: $EXIT_CODE"
 
-          if [ $EXIT_CODE -eq 0 ]; then
+          if [ "$EXIT_CODE" -eq 0 ]; then
             echo "has_changes=false" >> $GITHUB_OUTPUT
             echo "No changes detected"
-          elif [ $EXIT_CODE -eq 2 ]; then
+          elif [ "$EXIT_CODE" -eq 2 ]; then
             echo "has_changes=true" >> $GITHUB_OUTPUT
             echo "Changes detected"
           else
