@@ -211,8 +211,10 @@ jobs:
   prod:
     name: Prod Environment
     needs: [detect-changes, dev]
+    # Only run on push to main, not on PRs
     if: |
       always() &&
+      github.event_name != 'pull_request' &&
       (needs.detect-changes.outputs.prod == 'true' ||
        needs.detect-changes.outputs.modules == 'true') &&
       (needs.dev.result == 'success' || needs.dev.result == 'skipped')
