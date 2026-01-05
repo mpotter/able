@@ -31,6 +31,9 @@ const PORT = 8374;
 const REDIRECT_URL = `http://localhost:${PORT}/callback`;
 
 // HTML page that auto-submits the manifest to GitHub
+const fullManifest = { ...manifest, redirect_url: REDIRECT_URL };
+const manifestJson = JSON.stringify(fullManifest);
+
 const formHtml = `
 <!DOCTYPE html>
 <html>
@@ -38,9 +41,12 @@ const formHtml = `
 <body>
   <p>Redirecting to GitHub...</p>
   <form id="form" action="https://github.com/settings/apps/new" method="post">
-    <input type="hidden" name="manifest" value='${JSON.stringify({ ...manifest, redirect_url: REDIRECT_URL })}'>
+    <input type="hidden" name="manifest" id="manifest">
   </form>
-  <script>document.getElementById('form').submit();</script>
+  <script>
+    document.getElementById('manifest').value = ${JSON.stringify(manifestJson)};
+    document.getElementById('form').submit();
+  </script>
 </body>
 </html>
 `;
