@@ -61,19 +61,6 @@ AWS_PROFILE=able terraform apply
 
 ### Release Process
 
-This repo uses [changesets](https://github.com/changesets/changesets) for versioning and releases.
+See [docs/RELEASES.md](docs/RELEASES.md) for full details.
 
-**For contributors:**
-1. Make your changes on a feature branch
-2. Run `bun run changeset` to create a changeset describing your changes
-3. Select the packages affected and the semver bump type (patch/minor/major)
-4. Commit the generated `.changeset/*.md` file with your PR
-
-**Automated flow:**
-1. PRs merged to `main` → auto-deploy to **dev**
-2. When PRs with changesets are merged, a "chore: release" PR is created/updated
-3. Merging the release PR → creates a GitHub release → auto-deploy to **prod**
-
-**When to add a changeset:**
-- New features, bug fixes, or breaking changes that affect users
-- Skip for: CI changes, docs, internal refactors with no user impact
+**Quick start:** Run `bun changeset` before opening a PR with user-facing changes. Skip for CI/docs/refactors (use `skip-changeset` label).

@@ -40,26 +40,9 @@ jobs:
         uses: changesets/action@v1
         with:
           version: bun run version
+          publish: echo "Release ready"  # No npm publish, just trigger release creation
           commit: "chore: release"
           title: "chore: release"
+          createGithubReleases: true
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
-
-      # Create GitHub Release only when:
-      # 1. No pending changesets (they were just consumed by release PR merge)
-      # 2. Commit message indicates this is a release PR merge
-      - name: Create GitHub Release
-        if: steps.changesets.outputs.hasChangesets == 'false' && startsWith(github.event.head_commit.message, 'chore:' )
-        run: |
-          VERSION=$(jq -r '.version' apps/dotco/package.json)
-
-          # Extract changelog for this version
-          CHANGELOG=$(sed -n "/## $VERSION/,/## [0-9]/p" apps/dotco/CHANGELOG.md 2>/dev/null | sed '$d' || echo "Release v$VERSION")
-
-          # Create the release
-          gh release create "v$VERSION" \
-            --title "v$VERSION" \
-            --notes "$CHANGELOG" \
-            --target main
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -27,7 +27,14 @@ jobs:
       - name: Check for changeset
         env:
           LABELS: ${{ toJson(github.event.pull_request.labels.*.name) }}
+          HEAD_REF: ${{ github.head_ref }}
         run: |
+          # Skip for release PRs (created by changesets action)
+          if [[ "$HEAD_REF" == changeset-release/* ]]; then
+            echo "✓ Skipping changeset check (release PR)"
+            exit 0
+          fi
+
           # Check for skip label
           if echo "$LABELS" | grep -q "skip-changeset"; then
             echo "✓ Skipping changeset check (skip-changeset label found)"
