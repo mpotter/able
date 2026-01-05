@@ -24,12 +24,12 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Build Next.js app
+# Build Next.js app from the project root
 ENV NEXT_TELEMETRY_DISABLED=1
-WORKDIR /app/apps/web
-# Symlink to root node_modules so packages resolve correctly
-RUN ln -s /app/node_modules ./node_modules && \
-    npx next build
+# Check what's in node_modules and build
+RUN ls -la node_modules/.bin/ 2>/dev/null || echo "No .bin directory" && \
+    ls node_modules/next/dist/bin/ 2>/dev/null || echo "No next bin" && \
+    cd apps/web && node ../../node_modules/next/dist/bin/next build
 
 # Production image
 FROM base AS runner
