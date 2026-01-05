@@ -1,5 +1,5 @@
 import { anthropic } from "@ai-sdk/anthropic";
-import { streamText, tool } from "ai";
+import { streamText, tool, stepCountIs } from "ai";
 import { z } from "zod";
 import { createDb, leads } from "@/lib/db";
 
@@ -105,7 +105,7 @@ export async function POST(req: Request) {
       getCompanyInfo: tool({
         description:
           "Get information about Able, our services, platform (Optic), approach to AI automation, and company beliefs.",
-        parameters: z.object({
+        inputSchema: z.object({
           query: z.string().describe("The topic the user is asking about"),
         }),
         execute: async ({ query }) => ({
@@ -116,7 +116,7 @@ export async function POST(req: Request) {
       captureLeadInfo: tool({
         description:
           "Capture contact information from a potential customer interested in Able's services.",
-        parameters: z.object({
+        inputSchema: z.object({
           name: z.string().describe("The person's full name"),
           email: z.string().email().describe("The person's email address"),
           company: z.string().optional().describe("The person's company name"),
@@ -145,7 +145,7 @@ export async function POST(req: Request) {
       scheduleDemo: tool({
         description:
           "Express interest in scheduling a demo of Able's services or the Optic platform.",
-        parameters: z.object({
+        inputSchema: z.object({
           name: z.string().describe("The person's full name"),
           email: z.string().email().describe("The person's email address"),
           company: z.string().optional().describe("The person's company name"),
@@ -173,8 +173,8 @@ export async function POST(req: Request) {
         },
       }),
     },
-    maxSteps: 5,
+    stopWhen: stepCountIs(5),
   });
 
-  return result.toDataStreamResponse();
+  return result.toTextStreamResponse();
 }

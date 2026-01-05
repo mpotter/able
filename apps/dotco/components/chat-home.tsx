@@ -1,6 +1,7 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
+import { TextStreamChatTransport } from "ai";
 import { useRef, useEffect, useState, useCallback } from "react";
 import { introMessages, introConfig } from "@/content/intro";
 
@@ -33,11 +34,25 @@ export function ChatHome() {
   const [introState, setIntroState] = useState<IntroMessage[]>([]);
   const [introComplete, setIntroComplete] = useState(false);
   const [introStarted, setIntroStarted] = useState(false);
+  const [input, setInput] = useState("");
 
-  const { messages, input, handleInputChange, handleSubmit, setInput, isLoading } =
+  const { messages, sendMessage, status } =
     useChat({
-      api: "/api/chat",
+      transport: new TextStreamChatTransport({ api: "/api/chat" }),
     });
+
+  const isLoading = status === "submitted" || status === "streaming";
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim()) return;
+    sendMessage({ text: input });
+    setInput("");
+  };
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -164,7 +179,12 @@ export function ChatHome() {
                     : "bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-white"
                 }`}
               >
-                <p className="whitespace-pre-wrap text-sm">{message.content}</p>
+                <p className="whitespace-pre-wrap text-sm">
+                  {message.parts
+                    ?.filter((part): part is { type: "text"; text: string } => part.type === "text")
+                    .map((part) => part.text)
+                    .join("")}
+                </p>
               </div>
             </div>
           ))}
