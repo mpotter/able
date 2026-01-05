@@ -1,5 +1,5 @@
 import { anthropic } from "@ai-sdk/anthropic";
-import { streamText, tool, stepCountIs } from "ai";
+import { streamText, tool, stepCountIs, convertToModelMessages } from "ai";
 import { z } from "zod";
 import { createDb, leads } from "@/lib/db";
 
@@ -97,10 +97,13 @@ export async function POST(req: Request) {
     ? createDb(process.env.DATABASE_URL)
     : null;
 
+  // Convert UIMessage format (from useChat) to ModelMessage format (for streamText)
+  const modelMessages = await convertToModelMessages(messages);
+
   const result = streamText({
     model: anthropic("claude-sonnet-4-20250514"),
     system: systemPrompt,
-    messages,
+    messages: modelMessages,
     tools: {
       getCompanyInfo: tool({
         description:
@@ -176,5 +179,5 @@ export async function POST(req: Request) {
     stopWhen: stepCountIs(5),
   });
 
-  return result.toTextStreamResponse();
+  return result.toUIMessageStreamResponse();
 }
