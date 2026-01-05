@@ -89,7 +89,7 @@ jobs:
           ENVIRONMENT: ${{ steps.env.outputs.environment }}
         run: |
           aws ecs update-service \
-            --cluster able-$ENVIRONMENT \
+            --cluster able-$ENVIRONMENT-cluster \
             --service able-$ENVIRONMENT-dotco \
             --force-new-deployment
 
@@ -98,5 +98,5 @@ jobs:
           ENVIRONMENT: ${{ steps.env.outputs.environment }}
         run: |
           aws ecs wait services-stable \
-            --cluster able-$ENVIRONMENT \
+            --cluster able-$ENVIRONMENT-cluster \
             --services able-$ENVIRONMENT-dotco
