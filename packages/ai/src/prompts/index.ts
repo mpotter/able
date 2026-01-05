@@ -1,1 +1,0 @@
-export { systemPrompt } from "./system";

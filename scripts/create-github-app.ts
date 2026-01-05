@@ -21,6 +21,7 @@ const manifest = {
     metadata: "read",
     pull_requests: "write",
     actions: "write",
+    secrets: "write",
   },
 };
 

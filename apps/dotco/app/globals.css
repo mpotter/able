@@ -1,5 +1,20 @@
 @import "tailwindcss";
 
+@variant dark (@media (prefers-color-scheme: dark));
+
 @theme {
   --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+@keyframes logo-reveal {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.animate-logo-reveal {
+  animation: logo-reveal 1.2s ease-out forwards;
 }

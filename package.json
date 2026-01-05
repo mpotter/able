@@ -9,11 +9,11 @@
     "dev": "bun run --filter=@able/dotco dev",
     "build": "bun run --filter=* build",
     "lint": "bun run --filter=* lint",
-    "db:generate": "bun run --filter=@able/db generate",
-    "db:migrate": "bun run --filter=@able/db migrate",
-    "db:studio": "bun run --filter=@able/db studio"
+    "db:generate": "bun run --filter=@able/dotco db:generate",
+    "db:migrate": "bun run --filter=@able/dotco db:migrate",
+    "db:studio": "bun run --filter=@able/dotco db:studio"
   },
   "devDependencies": {
-    "typescript": "^5.7.2"
+    "typescript": "^5.9.3"
   }
 }

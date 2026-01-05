@@ -330,7 +330,10 @@ resource "aws_iam_role_policy" "github_actions" {
           "budgets:ModifyBudget",
           "budgets:CreateBudgetAction",
           "budgets:DeleteBudgetAction",
-          "budgets:UpdateBudgetAction"
+          "budgets:UpdateBudgetAction",
+          "budgets:ListTagsForResource",
+          "budgets:TagResource",
+          "budgets:UntagResource"
         ]
         Resource = "arn:aws:budgets::${data.aws_caller_identity.current.account_id}:budget/${var.project_name}-*"
       }

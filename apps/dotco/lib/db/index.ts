@@ -7,7 +7,6 @@ let db: ReturnType<typeof drizzle<typeof schema>> | null = null;
 export function createDb(connectionString?: string) {
   if (db) return db;
 
-  // Build connection string from environment if not provided
   const connString =
     connectionString ||
     process.env.DATABASE_URL ||
