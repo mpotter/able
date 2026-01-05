@@ -24,7 +24,7 @@ COPY . .
 # Build Next.js app
 WORKDIR /app/apps/web
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN /app/node_modules/.bin/next build
+RUN bunx --bun next build
 
 # Production image
 FROM base AS runner
