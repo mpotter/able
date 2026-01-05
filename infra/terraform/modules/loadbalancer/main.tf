@@ -50,6 +50,9 @@ resource "aws_lb_target_group" "main" {
   vpc_id      = var.vpc_id
   target_type = "ip"
 
+  # Lower from default 300s to allow faster task replacement during deployments
+  deregistration_delay = 30
+
   health_check {
     enabled             = true
     healthy_threshold   = 2
