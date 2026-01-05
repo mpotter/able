@@ -70,6 +70,17 @@ resource "aws_iam_role_policy" "github_actions" {
           "${aws_s3_bucket.terraform_state.arn}/*"
         ]
       },
+      # Terraform state locking (DynamoDB)
+      {
+        Effect = "Allow"
+        Action = [
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:DeleteItem",
+          "dynamodb:DescribeTable"
+        ]
+        Resource = aws_dynamodb_table.terraform_locks.arn
+      },
       {
         Effect = "Allow"
         Action = [
@@ -96,14 +107,14 @@ resource "aws_iam_role_policy" "github_actions" {
           "ecs:UpdateService",
           "ecs:DescribeServices"
         ]
-        Resource = "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:service/${var.project_name}-*/*"
+        Resource = "arn:aws:ecs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:service/${var.project_name}-*/*"
       },
       {
         Effect = "Allow"
         Action = [
           "ecs:DescribeClusters"
         ]
-        Resource = "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:cluster/${var.project_name}-*"
+        Resource = "arn:aws:ecs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:cluster/${var.project_name}-*"
       },
       # Terraform infrastructure management
       {
