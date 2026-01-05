@@ -63,10 +63,23 @@ resource "aws_route53_record" "app" {
   }
 }
 
-# www subdomain
+# www subdomain (will point to prod in future)
 resource "aws_route53_record" "www" {
   zone_id = aws_route53_zone.main.zone_id
   name    = "www.${var.domain_name}"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.main.dns_name
+    zone_id                = aws_lb.main.zone_id
+    evaluate_target_health = true
+  }
+}
+
+# dev subdomain
+resource "aws_route53_record" "dev" {
+  zone_id = aws_route53_zone.main.zone_id
+  name    = "dev.${var.domain_name}"
   type    = "A"
 
   alias {
