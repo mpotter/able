@@ -184,7 +184,7 @@ resource "aws_iam_role_policy" "github_actions" {
         ]
         Resource = "*"
       },
-      # RDS
+      # RDS - scoped to project resources
       {
         Effect = "Allow"
         Action = [
@@ -192,14 +192,17 @@ resource "aws_iam_role_policy" "github_actions" {
         ]
         Resource = [
           "arn:aws:rds:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:cluster:${var.project_name}-*",
+          "arn:aws:rds:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:db:${var.project_name}-*",
           "arn:aws:rds:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:cluster-pg:*",
           "arn:aws:rds:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:subgrp:${var.project_name}-*"
         ]
       },
+      # RDS - describe operations need broader access
       {
         Effect = "Allow"
         Action = [
           "rds:DescribeDBClusters",
+          "rds:DescribeDBInstances",
           "rds:DescribeDBSubnetGroups",
           "rds:DescribeDBClusterParameterGroups",
           "rds:DescribeDBClusterParameters",
