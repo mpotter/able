@@ -1,5 +1,11 @@
 # @able/dotco
 
+## 0.0.4
+
+### Patch Changes
+
+- [#19](https://github.com/mpotter/able/pull/19) [`6f3507c`](https://github.com/mpotter/able/commit/6f3507cd5ab3d255312b6dba3c41d8a3bf20020a) Thanks [@mpotter](https://github.com/mpotter)! - Fix chat message streaming not displaying responses
+
 ## 0.0.3
 
 ### Patch Changes
