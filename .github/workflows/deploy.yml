@@ -19,6 +19,11 @@ on:
 env:
   AWS_REGION: us-east-1
 
+# Prevent concurrent deployments
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build-and-deploy:
     name: Build and Deploy
