@@ -56,6 +56,20 @@ resource "aws_iam_role_policy" "github_actions" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
+      # Terraform state access
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          aws_s3_bucket.terraform_state.arn,
+          "${aws_s3_bucket.terraform_state.arn}/*"
+        ]
+      },
       {
         Effect = "Allow"
         Action = [
@@ -90,6 +104,25 @@ resource "aws_iam_role_policy" "github_actions" {
           "ecs:DescribeClusters"
         ]
         Resource = "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:cluster/${var.project_name}-*"
+      },
+      # Terraform infrastructure management
+      {
+        Effect = "Allow"
+        Action = [
+          "ecs:*",
+          "ec2:*",
+          "elasticloadbalancing:*",
+          "rds:*",
+          "secretsmanager:*",
+          "acm:*",
+          "route53:*",
+          "route53domains:*",
+          "logs:*",
+          "iam:*",
+          "ecr:*",
+          "s3:*"
+        ]
+        Resource = "*"
       }
     ]
   })
