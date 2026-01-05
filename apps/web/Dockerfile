@@ -3,23 +3,17 @@ FROM node:20-slim AS base
 # Install bun for package management
 RUN npm install -g bun
 
-# Install dependencies only when needed
+# Install dependencies - copy full source for workspace resolution
 FROM base AS deps
 WORKDIR /app
 
-# Copy workspace files
+# Copy everything needed for install
 COPY package.json bun.lock ./
 COPY apps/web/package.json ./apps/web/
-COPY packages/ai/package.json ./packages/ai/
-COPY packages/db/package.json ./packages/db/
-COPY packages/ui/package.json ./packages/ui/
-COPY packages/config/package.json ./packages/config/
+COPY packages/ ./packages/
 
-RUN bun install --frozen-lockfile && \
-    echo "=== node_modules contents ===" && \
-    ls node_modules/ | head -20 && \
-    echo "=== .bin contents ===" && \
-    ls -la node_modules/.bin/ 2>/dev/null || echo "No .bin"
+# Install dependencies
+RUN bun install --frozen-lockfile
 
 # Build the application
 FROM base AS builder
@@ -28,12 +22,9 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Build Next.js app from the project root
+# Build Next.js app
 ENV NEXT_TELEMETRY_DISABLED=1
-# Check what's in node_modules and build
-RUN ls -la node_modules/.bin/ 2>/dev/null || echo "No .bin directory" && \
-    ls node_modules/next/dist/bin/ 2>/dev/null || echo "No next bin" && \
-    cd apps/web && node ../../node_modules/next/dist/bin/next build
+RUN cd apps/web && npx next build
 
 # Production image
 FROM base AS runner
