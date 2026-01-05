@@ -1,5 +1,11 @@
 FROM oven/bun:1 AS base
 
+# Install Node.js for running Next.js build
+RUN apt-get update && apt-get install -y curl && \
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs && \
+    rm -rf /var/lib/apt/lists/*
+
 # Install dependencies only when needed
 FROM base AS deps
 WORKDIR /app
@@ -26,7 +32,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 WORKDIR /app/apps/web
 # Create symlink for node_modules so next can resolve packages
 RUN ln -s /app/node_modules ./node_modules && \
-    bun run build
+    npx next build
 
 # Production image
 FROM base AS runner
