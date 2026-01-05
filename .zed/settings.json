@@ -1,0 +1,25 @@
+{
+  "file_scan_exclusions": [
+    "**/.git",
+    "**/.svn",
+    "**/.hg",
+    "**/.jj",
+    "**/CVS",
+    "**/.DS_Store",
+    "**/Thumbs.db",
+    "**/.classpath",
+    "**/.settings",
+    "**/node_modules",
+    "**/dist",
+    "**/build",
+    "**/coverage",
+    "**/bun.lockb",
+  ],
+  "formatter": "auto",
+  "format_on_save": "on",
+  "preferred_line_length": 80,
+  "prettier": {
+    "allowed": true,
+  },
+  "tab_size": 2,
+}
