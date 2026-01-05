@@ -1,40 +1,37 @@
-FROM node:20-slim AS base
+FROM oven/bun:1.3 AS base
 
-# Install bun for package management
-RUN npm install -g bun
-
-# Install dependencies - copy full source for workspace resolution
+# Install dependencies
 FROM base AS deps
 WORKDIR /app
 
-# Copy everything needed for install
+# Copy entire monorepo for workspace resolution
 COPY package.json bun.lock ./
-COPY apps/web/package.json ./apps/web/
+COPY apps/ ./apps/
 COPY packages/ ./packages/
 
-# Install dependencies
+# Install dependencies with bun
 RUN bun install --frozen-lockfile
 
 # Build the application
 FROM base AS builder
 WORKDIR /app
 
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+COPY --from=deps /app ./
 
-# Build Next.js app
+# Build Next.js app using bun
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN cd apps/web && npx next build
+WORKDIR /app/apps/web
+RUN bun run build
 
 # Production image
-FROM base AS runner
+FROM oven/bun:1.3-slim AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN groupadd --system --gid 1001 nodejs
-RUN useradd --system --uid 1001 --gid nodejs nextjs
+RUN groupadd --system --gid 1001 nodejs && \
+    useradd --system --uid 1001 --gid nodejs nextjs
 
 # Copy built assets
 COPY --from=builder /app/apps/web/public ./public
@@ -47,4 +44,4 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["node", "server.js"]
+CMD ["bun", "run", "server.js"]

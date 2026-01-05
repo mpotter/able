@@ -12,9 +12,9 @@
     "next": "^15.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "@able/ui": "workspace:*",
-    "@able/ai": "workspace:*",
-    "@able/db": "workspace:*",
+    "@able/ui": "*",
+    "@able/ai": "*",
+    "@able/db": "*",
     "ai": "^4.0.0",
     "@ai-sdk/anthropic": "^1.0.0",
     "zod": "^3.24.1"
