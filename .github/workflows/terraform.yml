@@ -172,7 +172,9 @@ jobs:
         run: exit 1
 
       - name: Upload Plan
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: |
+          steps.plan.outputs.has_changes == 'true' &&
+          (github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main'))
         uses: actions/upload-artifact@v4
         with:
           name: tfplan-${{ env.TF_ENVIRONMENT }}
