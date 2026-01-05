@@ -30,5 +30,5 @@ able/
 
 ## Documentation
 
-- [CLAUDE.md](CLAUDE.md) - Development guidelines
-- [docs/INFRA.md](docs/INFRA.md) - Infrastructure setup (AWS, Terraform, CI)
+- [CLAUDE.md](CLAUDE.md) - Special file that Claude automatically pulls into context when starting a conversation
+- [infra/README.md](infra/README.md) - Infrastructure setup (AWS, Terraform, CI)
