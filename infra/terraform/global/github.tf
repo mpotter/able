@@ -54,6 +54,14 @@ resource "github_actions_secret" "aws_role_arn" {
   plaintext_value = aws_iam_role.github_actions.arn
 }
 
+# Labels for dependabot
+resource "github_issue_label" "dependencies" {
+  repository  = var.github_repo
+  name        = "dependencies"
+  description = "Pull requests that update a dependency file"
+  color       = "0366d6"
+}
+
 # Branch protection for main branch
 resource "github_branch_protection" "main" {
   repository_id = var.github_repo
