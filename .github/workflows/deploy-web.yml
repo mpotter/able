@@ -10,6 +10,8 @@ on:
       - 'package.json'
       - 'bun.lock'
       - '.github/workflows/deploy-web.yml'
+  release:
+    types: [published]
   workflow_dispatch:
     inputs:
       environment:
@@ -19,22 +21,22 @@ on:
         type: choice
         options:
           - dev
-          - staging
           - prod
 
 env:
   AWS_REGION: us-east-1
 
-# Prevent concurrent deployments
+# Prevent concurrent deployments to the same environment
 concurrency:
-  group: deploy-web-${{ github.event.inputs.environment || 'dev' }}
+  group: deploy-web-${{ github.event.inputs.environment || (github.event_name == 'release' && 'prod') || 'dev' }}
   cancel-in-progress: false
 
 jobs:
   build-and-deploy:
     name: Build and Deploy
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment || 'dev' }}
+    # Determine environment: release → prod, push to main → dev, manual → input
+    environment: ${{ github.event.inputs.environment || (github.event_name == 'release' && 'prod') || 'dev' }}
 
     permissions:
       id-token: write
@@ -43,6 +45,20 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Determine environment
+        id: env
+        run: |
+          if [ "${{ github.event_name }}" == "release" ]; then
+            echo "environment=prod" >> $GITHUB_OUTPUT
+            echo "image_tag=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.inputs.environment }}" != "" ]; then
+            echo "environment=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
+            echo "image_tag=${{ github.sha }}" >> $GITHUB_OUTPUT
+          else
+            echo "environment=dev" >> $GITHUB_OUTPUT
+            echo "image_tag=${{ github.sha }}" >> $GITHUB_OUTPUT
+          fi
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -59,17 +75,18 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: able-web
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: ${{ steps.env.outputs.image_tag }}
+          ENVIRONMENT: ${{ steps.env.outputs.environment }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f apps/web/Dockerfile .
-          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:$ENVIRONMENT-latest
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$ENVIRONMENT-latest
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
       - name: Update ECS service
         env:
-          ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
+          ENVIRONMENT: ${{ steps.env.outputs.environment }}
         run: |
           aws ecs update-service \
             --cluster able-$ENVIRONMENT \
@@ -78,7 +95,7 @@ jobs:
 
       - name: Wait for deployment
         env:
-          ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
+          ENVIRONMENT: ${{ steps.env.outputs.environment }}
         run: |
           aws ecs wait services-stable \
             --cluster able-$ENVIRONMENT \
