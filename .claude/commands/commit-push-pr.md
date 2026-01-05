@@ -14,10 +14,13 @@ git diff --stat
 ## Instructions
 
 1. Review the staged and unstaged changes shown above
-2. Stage all relevant changes with `git add`
-3. Create a commit with a descriptive message that explains the "why" not just the "what"
-4. Push to the remote (create upstream branch if needed with `-u`)
-5. Create a pull request using `gh pr create` with:
+2. Check if a changeset is needed for this PR:
+   - **Yes**: User-facing changes (features, fixes, breaking changes) → run `bun changeset`
+   - **No**: CI, docs, internal refactors → add `skip-changeset` label to PR later
+3. Stage all relevant changes with `git add` (include `.changeset/*.md` if created)
+4. Create a commit with a descriptive message that explains the "why" not just the "what"
+5. Push to the remote (create upstream branch if needed with `-u`)
+6. Create a pull request using `gh pr create` with:
    - A clear, descriptive title
    - A summary of changes in the body
    - Link any related issues if mentioned in commits
