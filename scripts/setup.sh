@@ -99,16 +99,14 @@ if [ $ERRORS -gt 0 ]; then
   # Check if GitHub App secrets are the issue
   if ! check_secret "GH_APP_ID" 2>/dev/null || ! check_secret "GH_APP_PRIVATE_KEY" 2>/dev/null; then
     echo ""
-    echo "GitHub App not configured."
+    echo "GitHub App not configured. Creating it now..."
     echo ""
-    echo "Run the following to create it:"
-    echo "  bun scripts/create-github-app.ts"
+
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    bun "$SCRIPT_DIR/create-github-app.ts"
+
     echo ""
-    echo "This will:"
-    echo "  1. Open GitHub to create the app"
-    echo "  2. Save the private key locally"
-    echo "  3. Show commands to set the secrets"
-    echo ""
+    echo "After installing the app and setting secrets, re-run this script to verify."
   fi
   exit 1
 else
