@@ -96,8 +96,9 @@ When you merge the release PR:
 
 1. The release workflow detects no pending changesets
 2. Creates a GitHub Release with tag `{package-name}-v{version}` (e.g., `@able/dotco-v0.0.3`)
-3. Triggers the production deploy workflow
-4. **Manual step**: Approve the prod deployment in GitHub Actions (required reviewer protection)
+3. Triggers the production deploy workflow (fully automated)
+
+Note: Approval happens at the PR merge step via CODEOWNERS, not at deploy time.
 
 ## Version Strategy
 

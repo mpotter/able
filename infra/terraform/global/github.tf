@@ -33,10 +33,8 @@ resource "github_repository_environment" "prod" {
   repository  = var.github_repo
   environment = "prod"
 
-  reviewers {
-    users = [data.github_user.current.id]
-  }
-
+  # No reviewers - approval happens at PR merge via code owners
+  # Only allow deployments from protected branches (main)
   deployment_branch_policy {
     protected_branches     = true
     custom_branch_policies = false
@@ -67,12 +65,12 @@ resource "github_branch_protection" "main" {
   repository_id = var.github_repo
   pattern       = "main"
 
-  # Require PR with at least 1 approval (admins can bypass with enforce_admins = false)
+  # Require PR with code owner approval (admins can bypass with enforce_admins = false)
   required_pull_request_reviews {
     required_approving_review_count = 1
     dismiss_stale_reviews           = true
-    require_code_owner_reviews      = false
-    require_last_push_approval      = false  # Allow last pusher to approve
+    require_code_owner_reviews      = true  # Require approval from @mpotter per CODEOWNERS
+    require_last_push_approval      = false # Allow last pusher to approve
   }
 
   # Require status checks to pass
