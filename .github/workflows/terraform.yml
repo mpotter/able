@@ -84,7 +84,6 @@ jobs:
       contents: read
       pull-requests: write
       actions: write
-      administration: write
 
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
