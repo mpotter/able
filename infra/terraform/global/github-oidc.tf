@@ -155,6 +155,15 @@ resource "aws_iam_role_policy" "github_actions" {
         ]
         Resource = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.project_name}-*"
       },
+      # IAM OIDC Provider - for reading GitHub OIDC provider
+      {
+        Effect = "Allow"
+        Action = [
+          "iam:ListOpenIDConnectProviders",
+          "iam:GetOpenIDConnectProvider"
+        ]
+        Resource = "*"
+      },
       # Terraform state
       {
         Effect = "Allow"
