@@ -23,9 +23,9 @@ resource "aws_cloudwatch_log_group" "main" {
   retention_in_days = 30
 }
 
-# Security Group for ECS Tasks (only create if not provided externally)
+# Security Group for ECS Tasks (only create if not using external)
 resource "aws_security_group" "ecs_tasks" {
-  count = var.security_group_id == null ? 1 : 0
+  count = var.use_external_security_group ? 0 : 1
 
   name        = "${var.name_prefix}-ecs-tasks-sg"
   description = "Security group for ECS tasks"
@@ -52,7 +52,7 @@ resource "aws_security_group" "ecs_tasks" {
 
 # Add ingress rule if using external security group
 resource "aws_security_group_rule" "ecs_ingress" {
-  count = var.security_group_id != null ? 1 : 0
+  count = var.use_external_security_group ? 1 : 0
 
   type                     = "ingress"
   from_port                = var.container_port
@@ -63,7 +63,7 @@ resource "aws_security_group_rule" "ecs_ingress" {
 }
 
 locals {
-  ecs_security_group_id = var.security_group_id != null ? var.security_group_id : aws_security_group.ecs_tasks[0].id
+  ecs_security_group_id = var.use_external_security_group ? var.security_group_id : aws_security_group.ecs_tasks[0].id
 }
 
 # IAM Roles

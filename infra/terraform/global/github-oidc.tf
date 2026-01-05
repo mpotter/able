@@ -5,7 +5,7 @@ data "aws_iam_openid_connect_provider" "github" {
 }
 
 resource "aws_iam_role" "github_actions" {
-  name = "github-actions-${var.project_name}"
+  name = "${var.project_name}-github-actions"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -28,7 +28,7 @@ resource "aws_iam_role" "github_actions" {
 }
 
 resource "aws_iam_role_policy" "github_actions" {
-  name = "github-actions-${var.project_name}"
+  name = "${var.project_name}-github-actions-policy"
   role = aws_iam_role.github_actions.id
 
   policy = jsonencode({

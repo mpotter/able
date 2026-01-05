@@ -12,10 +12,10 @@ resource "aws_secretsmanager_secret" "secrets" {
 }
 
 resource "aws_secretsmanager_secret_version" "secrets" {
-  for_each = { for k, v in var.secrets : k => v if v.value != null }
+  for_each = nonsensitive(toset(keys(var.secret_values)))
 
   secret_id     = aws_secretsmanager_secret.secrets[each.key].id
-  secret_string = each.value.value
+  secret_string = var.secret_values[each.key]
 
   lifecycle {
     ignore_changes = [secret_string]

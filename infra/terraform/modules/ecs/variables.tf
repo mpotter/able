@@ -24,9 +24,15 @@ variable "alb_security_group_id" {
 }
 
 variable "security_group_id" {
-  description = "External security group ID for ECS tasks (optional, creates one if not provided)"
+  description = "External security group ID for ECS tasks (required if use_external_security_group is true)"
   type        = string
   default     = null
+}
+
+variable "use_external_security_group" {
+  description = "Whether to use an external security group (must be true if security_group_id is provided)"
+  type        = bool
+  default     = false
 }
 
 variable "target_group_arn" {

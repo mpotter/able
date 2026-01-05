@@ -108,8 +108,10 @@ module "secrets" {
   secrets = {
     "anthropic-api-key" = {
       description = "Anthropic API Key"
-      value       = var.anthropic_api_key
     }
+  }
+  secret_values = {
+    "anthropic-api-key" = var.anthropic_api_key
   }
 }
 
@@ -117,13 +119,14 @@ module "secrets" {
 module "ecs" {
   source = "../../modules/ecs"
 
-  name_prefix           = local.name_prefix
-  service_name          = "dotco"
-  vpc_id                = module.networking.vpc_id
-  private_subnet_ids    = module.networking.private_subnet_ids
-  alb_security_group_id = module.loadbalancer.security_group_id
-  security_group_id     = aws_security_group.ecs_tasks.id
-  target_group_arn      = module.loadbalancer.target_group_arn
+  name_prefix                 = local.name_prefix
+  service_name                = "dotco"
+  vpc_id                      = module.networking.vpc_id
+  private_subnet_ids          = module.networking.private_subnet_ids
+  alb_security_group_id       = module.loadbalancer.security_group_id
+  security_group_id           = aws_security_group.ecs_tasks.id
+  use_external_security_group = true
+  target_group_arn            = module.loadbalancer.target_group_arn
   container_image       = "${data.terraform_remote_state.global.outputs.ecr_repository_url}:${var.environment}-latest"
   container_port        = var.container_port
   cpu                   = var.ecs_cpu

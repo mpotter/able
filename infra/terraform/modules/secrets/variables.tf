@@ -4,10 +4,16 @@ variable "name_prefix" {
 }
 
 variable "secrets" {
-  description = "Map of secrets to create"
+  description = "Map of secrets to create (metadata only)"
   type = map(object({
     description = string
-    value       = optional(string)
   }))
   default = {}
+}
+
+variable "secret_values" {
+  description = "Map of secret values to set (key must match secrets map)"
+  type        = map(string)
+  default     = {}
+  sensitive   = true
 }
