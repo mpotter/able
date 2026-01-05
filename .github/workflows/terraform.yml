@@ -84,17 +84,19 @@ jobs:
       - name: Terraform Plan
         id: plan
         working-directory: ${{ env.TF_WORKING_DIR }}
-        shell: bash
+        shell: bash {0}
         run: |
-          set +o pipefail  # Allow pipeline to continue even if terraform exits non-zero
-          set +e  # Disable errexit to allow capturing non-zero exit codes
+          # Run terraform plan - exit codes: 0=no changes, 1=error, 2=changes
           terraform plan \
             -var-file=environments/shared.tfvars \
             -var-file=environments/${{ env.TF_ENVIRONMENT }}.tfvars \
             -detailed-exitcode \
             -out=tfplan \
-            -no-color 2>&1 | tee plan_output.txt; EXIT_CODE="${PIPESTATUS[0]}"
-          set -e  # Re-enable errexit
+            -no-color > plan_output.txt 2>&1
+          EXIT_CODE=$?
+
+          # Show plan output
+          cat plan_output.txt
 
           echo "Terraform plan exit code: $EXIT_CODE"
 
