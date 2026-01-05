@@ -42,7 +42,7 @@ jobs:
       # 1. No pending changesets (they were just consumed by release PR merge)
       # 2. Commit message indicates this is a release PR merge
       - name: Create GitHub Release
-        if: ${{ steps.changesets.outputs.hasChangesets == 'false' && startsWith(github.event.head_commit.message, 'chore: release') }}
+        if: steps.changesets.outputs.hasChangesets == 'false' && startsWith(github.event.head_commit.message, 'chore:' )
         run: |
           VERSION=$(jq -r '.version' apps/dotco/package.json)
 
