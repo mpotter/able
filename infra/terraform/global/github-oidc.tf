@@ -322,7 +322,7 @@ resource "aws_iam_role_policy" "github_actions" {
         ]
         Resource = "*"
       },
-      # AWS Budgets
+      # AWS Budgets - needs broader access for ListTagsForResource
       {
         Effect = "Allow"
         Action = [
@@ -331,11 +331,17 @@ resource "aws_iam_role_policy" "github_actions" {
           "budgets:CreateBudgetAction",
           "budgets:DeleteBudgetAction",
           "budgets:UpdateBudgetAction",
-          "budgets:ListTagsForResource",
           "budgets:TagResource",
           "budgets:UntagResource"
         ]
         Resource = "arn:aws:budgets::${data.aws_caller_identity.current.account_id}:budget/${var.project_name}-*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "budgets:ListTagsForResource"
+        ]
+        Resource = "*"
       }
     ]
   })
