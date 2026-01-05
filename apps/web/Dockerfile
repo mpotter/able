@@ -30,9 +30,9 @@ COPY . .
 # Build Next.js app
 ENV NEXT_TELEMETRY_DISABLED=1
 WORKDIR /app/apps/web
-# Create symlink for node_modules so next can resolve packages
+# Use the installed next from node_modules, with Webpack instead of Turbopack
 RUN ln -s /app/node_modules ./node_modules && \
-    npx next build
+    ./node_modules/.bin/next build
 
 # Production image
 FROM base AS runner
