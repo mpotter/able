@@ -9,7 +9,7 @@ on:
       - 'packages/**'
       - 'package.json'
       - 'bun.lock'
-      - '.github/workflows/ci.yml'
+      - '.github/workflows/ci-web.yml'
   pull_request:
     branches:
       - main
@@ -18,7 +18,7 @@ on:
       - 'packages/**'
       - 'package.json'
       - 'bun.lock'
-      - '.github/workflows/ci.yml'
+      - '.github/workflows/ci-web.yml'
 
 jobs:
   lint-and-build:
