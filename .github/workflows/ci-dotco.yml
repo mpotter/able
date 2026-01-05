@@ -28,6 +28,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          # Allow pushing lockfile updates for dependabot
+          ref: ${{ github.head_ref }}
+          token: ${{ github.actor == 'dependabot[bot]' && secrets.GITHUB_TOKEN || github.token }}
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -35,6 +39,22 @@ jobs:
           bun-version: "1.3"
 
       - name: Install dependencies
+        run: bun install --frozen-lockfile
+        continue-on-error: ${{ github.actor == 'dependabot[bot]' }}
+        id: install
+
+      - name: Regenerate lockfile for dependabot
+        if: github.actor == 'dependabot[bot]' && steps.install.outcome == 'failure'
+        run: |
+          bun install
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add bun.lock
+          git commit -m "chore: regenerate bun.lock"
+          git push
+
+      - name: Reinstall after lockfile update
+        if: github.actor == 'dependabot[bot]' && steps.install.outcome == 'failure'
         run: bun install --frozen-lockfile
 
       - name: Type check
