@@ -8,13 +8,13 @@
         "typescript": "^5.7.2",
       },
     },
-    "apps/web": {
+    "apps/dotco": {
       "name": "@able/web",
       "version": "0.0.1",
       "dependencies": {
-        "@able/ai": "workspace:*",
-        "@able/db": "workspace:*",
-        "@able/ui": "workspace:*",
+        "@able/ai": "*",
+        "@able/db": "*",
+        "@able/ui": "*",
         "@ai-sdk/anthropic": "^1.0.0",
         "ai": "^4.0.0",
         "next": "^15.1.0",
@@ -85,7 +85,7 @@
 
     "@able/ui": ["@able/ui@workspace:packages/ui"],
 
-    "@able/web": ["@able/web@workspace:apps/web"],
+    "@able/web": ["@able/web@workspace:apps/dotco"],
 
     "@ai-sdk/anthropic": ["@ai-sdk/anthropic@1.2.12", "", { "dependencies": { "@ai-sdk/provider": "1.1.3", "@ai-sdk/provider-utils": "2.2.8" }, "peerDependencies": { "zod": "^3.0.0" } }, "sha512-YSzjlko7JvuiyQFmI9RN1tNZdEiZxc+6xld/0tq/VkJaHpEzGAb1yiNxxvmYVcjvfu/PcvCxAAYXmTYQQ63IHQ=="],
 
