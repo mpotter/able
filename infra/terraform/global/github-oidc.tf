@@ -51,24 +51,16 @@ resource "aws_iam_role_policy" "github_actions" {
       {
         Effect = "Allow"
         Action = [
-          "ecs:UpdateService",
-          "ecs:DescribeServices",
-          "ecs:RegisterTaskDefinition",
-          "ecs:DescribeTaskDefinition"
+          "ecs:*"
         ]
         Resource = "*"
       },
       {
         Effect = "Allow"
         Action = [
-          "iam:PassRole"
+          "iam:*"
         ]
         Resource = "*"
-        Condition = {
-          StringLike = {
-            "iam:PassedToService" = "ecs-tasks.amazonaws.com"
-          }
-        }
       },
       {
         Effect = "Allow"
