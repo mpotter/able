@@ -14,18 +14,29 @@ on:
       - 'infra/terraform/**'
       - '.github/workflows/terraform.yml'
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to plan/apply'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - prod
 
 env:
   AWS_REGION: us-east-1
   TF_WORKING_DIR: infra/terraform
+  # Default to dev for push/PR, use input for manual dispatch
+  TF_ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
 
 concurrency:
-  group: terraform-${{ github.event.pull_request.number || 'main' }}
+  group: terraform-${{ github.event.inputs.environment || 'dev' }}-${{ github.event.pull_request.number || 'main' }}
   cancel-in-progress: false
 
 jobs:
   plan:
-    name: Terraform Plan
+    name: Terraform Plan (${{ github.event.inputs.environment || 'dev' }})
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -34,6 +45,9 @@ jobs:
 
     outputs:
       has_changes: ${{ steps.plan.outputs.has_changes }}
+
+    env:
+      TF_VAR_anthropic_api_key: ${{ secrets.TF_VAR_ANTHROPIC_API_KEY }}
 
     steps:
       - name: Checkout
@@ -66,7 +80,11 @@ jobs:
         id: plan
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: |
-          terraform plan -detailed-exitcode -out=tfplan -no-color 2>&1 | tee plan_output.txt
+          terraform plan \
+            -var-file=environments/${{ env.TF_ENVIRONMENT }}.tfvars \
+            -detailed-exitcode \
+            -out=tfplan \
+            -no-color 2>&1 | tee plan_output.txt
           EXIT_CODE=${PIPESTATUS[0]}
 
           if [ $EXIT_CODE -eq 0 ]; then
@@ -86,12 +104,13 @@ jobs:
             const fs = require('fs');
             const plan = fs.readFileSync('${{ env.TF_WORKING_DIR }}/plan_output.txt', 'utf8');
             const hasChanges = '${{ steps.plan.outputs.has_changes }}' === 'true';
+            const env = '${{ env.TF_ENVIRONMENT }}';
 
             const truncatedPlan = plan.length > 60000
               ? plan.substring(0, 60000) + '\n\n... (truncated)'
               : plan;
 
-            const body = `## Terraform Plan ${hasChanges ? '⚠️ Changes Detected' : '✅ No Changes'}
+            const body = `## Terraform Plan (${env}) ${hasChanges ? '⚠️ Changes Detected' : '✅ No Changes'}
 
             <details>
             <summary>Show Plan</summary>
@@ -113,7 +132,7 @@ jobs:
             });
 
             const botComment = comments.find(c =>
-              c.user.type === 'Bot' && c.body.includes('## Terraform Plan')
+              c.user.type === 'Bot' && c.body.includes(`## Terraform Plan (${env})`)
             );
 
             if (botComment) {
@@ -140,20 +159,23 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
         with:
-          name: tfplan
+          name: tfplan-${{ env.TF_ENVIRONMENT }}
           path: ${{ env.TF_WORKING_DIR }}/tfplan
           retention-days: 1
 
   apply:
-    name: Terraform Apply
+    name: Terraform Apply (${{ github.event.inputs.environment || 'dev' }})
     needs: plan
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.plan.outputs.has_changes == 'true'
     runs-on: ubuntu-latest
-    environment: production
+    environment: ${{ github.event.inputs.environment || 'dev' }}
 
     permissions:
       id-token: write
       contents: read
+
+    env:
+      TF_VAR_anthropic_api_key: ${{ secrets.TF_VAR_ANTHROPIC_API_KEY }}
 
     steps:
       - name: Checkout
@@ -177,7 +199,7 @@ jobs:
       - name: Download Plan
         uses: actions/download-artifact@v4
         with:
-          name: tfplan
+          name: tfplan-${{ env.TF_ENVIRONMENT }}
           path: ${{ env.TF_WORKING_DIR }}
 
       - name: Terraform Apply
