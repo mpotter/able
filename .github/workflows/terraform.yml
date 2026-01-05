@@ -68,6 +68,11 @@ jobs:
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform init
 
+      - name: Select Workspace
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform workspace select ${{ env.TF_ENVIRONMENT }} || terraform workspace new ${{ env.TF_ENVIRONMENT }}
+
       - name: Terraform Format Check
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform fmt -check -recursive
@@ -196,6 +201,10 @@ jobs:
       - name: Terraform Init
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform init
+
+      - name: Select Workspace
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform workspace select ${{ env.TF_ENVIRONMENT }}
 
       - name: Download Plan
         uses: actions/download-artifact@v4
