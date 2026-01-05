@@ -1,9 +1,15 @@
-name: Deploy to AWS
+name: Deploy Web
 
 on:
   push:
     branches:
       - main
+    paths:
+      - 'apps/web/**'
+      - 'packages/**'
+      - 'package.json'
+      - 'bun.lock'
+      - '.github/workflows/deploy.yml'
   workflow_dispatch:
     inputs:
       environment:
@@ -21,7 +27,7 @@ env:
 
 # Prevent concurrent deployments
 concurrency:
-  group: deploy-${{ github.ref }}
+  group: deploy-web-${{ github.event.inputs.environment || 'dev' }}
   cancel-in-progress: false
 
 jobs:

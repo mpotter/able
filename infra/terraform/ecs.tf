@@ -192,6 +192,17 @@ resource "aws_ecs_service" "web" {
   desired_count   = var.environment == "prod" ? 2 : 1
   launch_type     = "FARGATE"
 
+  # Rolling deployment configuration for zero-downtime deploys
+  deployment_configuration {
+    minimum_healthy_percent = 100
+    maximum_percent         = 200
+  }
+
+  deployment_circuit_breaker {
+    enable   = true
+    rollback = true
+  }
+
   network_configuration {
     subnets          = aws_subnet.private[*].id
     security_groups  = [aws_security_group.ecs_tasks.id]
