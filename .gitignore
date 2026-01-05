@@ -49,3 +49,6 @@ override.tf.json
 *_override.tf
 *_override.tf.json
 infra/terraform/tfplan
+
+# Claude Code (keep personal settings private)
+.claude/settings.local.json

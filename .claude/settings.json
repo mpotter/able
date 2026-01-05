@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bun install:*)",
+      "Bash(bun run:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git mv:*)",
+      "Bash(git restore:*)",
+      "Bash(git rm:*)",
+      "Bash(gh pr:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh run view:*)",
+      "Bash(gh run watch:*)",
+      "Bash(AWS_PROFILE=able terraform init:*)",
+      "Bash(AWS_PROFILE=able terraform plan:*)",
+      "Bash(AWS_PROFILE=able terraform workspace:*)",
+      "Bash(docker build:*)",
+      "Bash(docker run:*)",
+      "WebSearch"
+    ]
+  }
+}
