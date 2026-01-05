@@ -59,6 +59,19 @@ AWS_PROFILE=able terraform apply
 - Use descriptive commit messages
 - Infrastructure changes auto-deploy on merge to `main`
 
+### Claude Workflow
+
+When implementing features or fixes:
+
+1. Create a feature branch: `git checkout -b feature/description`
+2. Make changes and commit
+3. Create a changeset file in `.changeset/` (patch/minor/major based on change type)
+4. Push and create PR: `git push -u origin HEAD && gh pr create`
+5. User approves and merges → deploys to dev
+6. Release PR auto-created → user merges → deploys to prod
+
+Skip changeset for: CI changes, docs-only, internal refactors (add `skip-changeset` label)
+
 ### Release Process
 
 See [docs/RELEASES.md](docs/RELEASES.md) for full details.
