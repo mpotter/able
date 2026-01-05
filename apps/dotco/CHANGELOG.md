@@ -1,5 +1,11 @@
 # @able/dotco
 
+## 0.0.3
+
+### Patch Changes
+
+- [`fa54edd`](https://github.com/mpotter/able/commit/fa54edd2c024beffa0b42d4f0c28198142011131) Thanks [@mpotter](https://github.com/mpotter)! - Switch to ALB health check instead of container health check for more reliable deployments
+
 ## 0.0.2
 
 ### Patch Changes
