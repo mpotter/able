@@ -21,10 +21,12 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Build Next.js app from root (for workspace support)
+# Build Next.js app
 ENV NEXT_TELEMETRY_DISABLED=1
 WORKDIR /app/apps/web
-RUN bun x next build
+# Create symlink for node_modules so next can resolve packages
+RUN ln -s /app/node_modules ./node_modules && \
+    node /app/node_modules/next/dist/bin/next build
 
 # Production image
 FROM base AS runner
