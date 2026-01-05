@@ -30,23 +30,29 @@ const manifest = {
 const PORT = 8374;
 const REDIRECT_URL = `http://localhost:${PORT}/callback`;
 
-// HTML page that auto-submits the manifest to GitHub
+// Build the manifest with redirect URL
 const fullManifest = { ...manifest, redirect_url: REDIRECT_URL };
 const manifestJson = JSON.stringify(fullManifest);
 
+// Debug: log the manifest
+console.log("Manifest being sent:");
+console.log(JSON.stringify(fullManifest, null, 2));
+console.log("");
+
+// Build the GitHub URL with manifest as query parameter
+const githubUrl = `https://github.com/settings/apps/new?manifest=${encodeURIComponent(manifestJson)}`;
+
+// Simple redirect page
 const formHtml = `
 <!DOCTYPE html>
 <html>
-<head><title>Creating GitHub App...</title></head>
+<head>
+  <title>Creating GitHub App...</title>
+  <meta http-equiv="refresh" content="0;url=${githubUrl.replace(/"/g, '&quot;')}">
+</head>
 <body>
   <p>Redirecting to GitHub...</p>
-  <form id="form" action="https://github.com/settings/apps/new" method="post">
-    <input type="hidden" name="manifest" id="manifest">
-  </form>
-  <script>
-    document.getElementById('manifest').value = ${JSON.stringify(manifestJson)};
-    document.getElementById('form').submit();
-  </script>
+  <p><a href="${githubUrl.replace(/"/g, '&quot;')}">Click here if not redirected</a></p>
 </body>
 </html>
 `;
