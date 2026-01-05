@@ -99,29 +99,16 @@ if [ $ERRORS -gt 0 ]; then
   # Check if GitHub App secrets are the issue
   if ! check_secret "GH_APP_ID" 2>/dev/null || ! check_secret "GH_APP_PRIVATE_KEY" 2>/dev/null; then
     echo ""
-    echo "GitHub App not configured. Opening browser to create it..."
+    echo "GitHub App not configured."
     echo ""
-
-    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-    # Open the HTML form in default browser
-    if command -v open &> /dev/null; then
-      open "$SCRIPT_DIR/create-github-app.html"
-    elif command -v xdg-open &> /dev/null; then
-      xdg-open "$SCRIPT_DIR/create-github-app.html"
-    else
-      echo "Please open scripts/create-github-app.html in your browser"
-    fi
-
-    echo "After creating the app:"
-    echo "1. Install it on the 'able' repository"
-    echo "2. Note the App ID from the app's settings"
-    echo "3. Generate a private key (downloads .pem)"
-    echo "4. Run:"
-    echo "   gh secret set GH_APP_ID"
-    echo "   gh secret set GH_APP_PRIVATE_KEY < ~/Downloads/able-terraform.*.pem"
+    echo "Run the following to create it:"
+    echo "  bun scripts/create-github-app.ts"
     echo ""
-    echo "Then re-run this script to verify."
+    echo "This will:"
+    echo "  1. Open GitHub to create the app"
+    echo "  2. Save the private key locally"
+    echo "  3. Show commands to set the secrets"
+    echo ""
   fi
   exit 1
 else
