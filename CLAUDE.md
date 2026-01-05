@@ -63,12 +63,13 @@ AWS_PROFILE=able terraform apply
 
 When implementing features or fixes:
 
-1. Create a feature branch: `git checkout -b feature/description`
-2. Make changes and commit
-3. Create a changeset file in `.changeset/` (patch/minor/major based on change type)
-4. Push and create PR: `git push -u origin HEAD && gh pr create`
-5. User approves and merges → deploys to dev
-6. Release PR auto-created → user merges → deploys to prod
+1. Make changes
+2. Create a changeset file in `.changeset/` (patch/minor/major based on change type)
+3. Run `/commit-push-pr` to commit, push to a feature branch, and create PR
+4. User approves and merges → deploys to dev
+5. Release PR auto-created → user merges → deploys to prod
+
+Run `/verify` to run linting and type checks before creating PR.
 
 Skip changeset for: CI changes, docs-only, internal refactors (add `skip-changeset` label)
 
