@@ -53,3 +53,15 @@ variable "skip_final_snapshot" {
   type        = bool
   default     = true
 }
+
+variable "backup_retention_period" {
+  description = "Days to retain automated backups (1-35)"
+  type        = number
+  default     = 7
+}
+
+variable "deletion_protection" {
+  description = "Prevent accidental database deletion"
+  type        = bool
+  default     = false
+}

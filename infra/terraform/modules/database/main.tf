@@ -38,6 +38,12 @@ resource "aws_rds_cluster" "main" {
   vpc_security_group_ids = [aws_security_group.aurora.id]
   skip_final_snapshot    = var.skip_final_snapshot
 
+  # Backup configuration
+  backup_retention_period      = var.backup_retention_period
+  preferred_backup_window      = "03:00-04:00"
+  deletion_protection          = var.deletion_protection
+  copy_tags_to_snapshot        = true
+
   serverlessv2_scaling_configuration {
     min_capacity = var.min_capacity
     max_capacity = var.max_capacity
