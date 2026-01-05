@@ -9,6 +9,7 @@
     "dev": "bun run --filter=@able/dotco dev",
     "build": "bun run --filter=* build",
     "lint": "bun run --filter=* lint",
+    "typecheck": "bun run --filter=* typecheck",
     "db:generate": "bun run --filter=@able/dotco db:generate",
     "db:migrate": "bun run --filter=@able/dotco db:migrate",
     "db:studio": "bun run --filter=@able/dotco db:studio"
