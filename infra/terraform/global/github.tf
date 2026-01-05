@@ -69,7 +69,7 @@ resource "github_branch_protection" "main" {
   # Require status checks to pass
   required_status_checks {
     strict   = true # Require branch to be up to date
-    contexts = []   # Add specific checks later if needed
+    contexts = ["Lint and Build"]
   }
 
   # Allow force pushes and deletions only for admins
