@@ -122,6 +122,10 @@ jobs:
           cat plan_output.txt
           echo "exit_code=$EXIT_CODE" >> $GITHUB_OUTPUT
 
+      - name: Check Plan Result
+        if: steps.plan.outputs.exit_code == '1'
+        run: exit 1
+
       - name: Terraform Apply
         if: |
           github.event_name != 'pull_request' &&
@@ -179,6 +183,10 @@ jobs:
           EXIT_CODE=$?
           cat plan_output.txt
           echo "exit_code=$EXIT_CODE" >> $GITHUB_OUTPUT
+
+      - name: Check Plan Result
+        if: steps.plan.outputs.exit_code == '1'
+        run: exit 1
 
       - name: Terraform Apply
         if: |
@@ -239,6 +247,10 @@ jobs:
           EXIT_CODE=$?
           cat plan_output.txt
           echo "exit_code=$EXIT_CODE" >> $GITHUB_OUTPUT
+
+      - name: Check Plan Result
+        if: steps.plan.outputs.exit_code == '1'
+        run: exit 1
 
       - name: Terraform Apply
         if: |
