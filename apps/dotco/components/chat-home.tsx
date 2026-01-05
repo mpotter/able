@@ -122,7 +122,7 @@ export function ChatHome() {
   }, [introStarted, streamMessage]);
 
   const handleSuggestionClick = (suggestion: string) => {
-    setInput(suggestion);
+    sendMessage({ text: suggestion });
   };
 
   const hasRealMessages = messages.length > 0;
