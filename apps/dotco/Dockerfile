@@ -20,7 +20,7 @@ COPY --from=deps /app ./
 
 # Build Next.js app using bun
 ENV NEXT_TELEMETRY_DISABLED=1
-WORKDIR /app/apps/web
+WORKDIR /app/apps/dotco
 RUN bun run build
 
 # Production image
@@ -34,9 +34,9 @@ RUN groupadd --system --gid 1001 nodejs && \
     useradd --system --uid 1001 --gid nodejs nextjs
 
 # Copy built assets (standalone preserves monorepo structure)
-COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
-COPY --from=builder /app/apps/web/public ./apps/web/public
-COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/apps/dotco/.next/standalone ./
+COPY --from=builder /app/apps/dotco/public ./apps/dotco/public
+COPY --from=builder --chown=nextjs:nodejs /app/apps/dotco/.next/static ./apps/dotco/.next/static
 
 USER nextjs
 
@@ -44,5 +44,5 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-WORKDIR /app/apps/web
+WORKDIR /app/apps/dotco
 CMD ["bun", "run", "server.js"]
