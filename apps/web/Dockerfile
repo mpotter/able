@@ -21,10 +21,9 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Build Next.js app
-WORKDIR /app/apps/web
+# Build Next.js app from root (for workspace support)
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN bunx --bun next build
+RUN cd apps/web && bun run build
 
 # Production image
 FROM base AS runner
