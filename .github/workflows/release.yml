@@ -65,4 +65,4 @@ jobs:
             --notes "$CHANGELOG" \
             --target main
         env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
