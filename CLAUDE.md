@@ -15,76 +15,36 @@ able/
 │   └── ui/            # Shared UI components (@able/ui)
 ├── infra/
 │   └── terraform/     # AWS infrastructure (ECS, Aurora, ALB)
+├── scripts/           # Setup and utility scripts
+├── docs/              # Documentation
 └── content/           # Static content
 ```
 
-## Tech Stack
+## Setup
 
-- **Runtime**: Bun
-- **Frontend**: Next.js 15, React 19, Tailwind CSS 4
-- **Database**: PostgreSQL with Drizzle ORM
-- **AI**: AI SDK with Anthropic provider
-- **Infrastructure**: AWS (ECS Fargate, Aurora PostgreSQL, ALB, Route53)
-- **IaC**: Terraform
+Run `./scripts/setup.sh` to validate and configure the environment. See [docs/SETUP.md](docs/SETUP.md) for details.
 
-## Initial Setup
-
-Run the setup script to validate all dependencies:
-```bash
-./scripts/setup.sh
-```
-
-### Required Configuration
-
-1. **AWS Profile**: Configure `able` profile in `~/.aws/credentials`
-
-2. **GitHub App** (for terraform to manage repo settings):
-   - Create app at https://github.com/settings/apps/new using `scripts/github-app-manifest.json`
-   - Install on the `able` repository
-   - Set secrets:
-     ```bash
-     gh secret set GH_APP_ID        # App ID from settings page
-     gh secret set GH_APP_PRIVATE_KEY < private-key.pem
-     ```
-
-3. **Other Secrets**:
-   ```bash
-   gh secret set AWS_ROLE_ARN              # arn:aws:iam::ACCOUNT:role/able-github-actions
-   gh secret set TF_VAR_ANTHROPIC_API_KEY  # Anthropic API key
-   ```
-
-4. **Optional Variables**:
-   ```bash
-   gh variable set ALARM_EMAIL  # Email for CloudWatch/Budget alerts
-   ```
+**Note**: Any new setup requirements should be added to `scripts/setup.sh` to keep configuration automated and documented.
 
 ## Commands
 
-### Development
 ```bash
+# Development
 bun run dev              # Start Next.js dev server
 bun install              # Install dependencies
-```
 
-### Database
-```bash
+# Database
 bun run db:generate      # Generate Drizzle migrations
 bun run db:migrate       # Run migrations
 bun run db:studio        # Open Drizzle Studio
-```
 
-### Build & Lint
-```bash
+# Build
 bun run build            # Build all packages
 bun run lint             # Lint all packages
-```
 
-### Infrastructure
-```bash
-# Use AWS_PROFILE=able for local terraform commands
-AWS_PROFILE=able terraform init
-AWS_PROFILE=able terraform plan -var-file=environments/shared.tfvars -var-file=environments/dev.tfvars
-AWS_PROFILE=able terraform apply -var-file=environments/shared.tfvars -var-file=environments/dev.tfvars
+# Infrastructure (local)
+AWS_PROFILE=able terraform plan
+AWS_PROFILE=able terraform apply
 ```
 
 ## Development Guidelines
@@ -105,7 +65,7 @@ AWS_PROFILE=able terraform apply -var-file=environments/shared.tfvars -var-file=
 - Use descriptive commit messages
 - Infrastructure changes auto-deploy on merge to `main`
 
-## Common Mistakes to Avoid
+## Common Mistakes
 
 - Don't import from `@able/db` directly; use `@able/db/schema` for schema types
 - Don't hardcode environment variables; use `.env.local` for local dev
