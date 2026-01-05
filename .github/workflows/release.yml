@@ -47,15 +47,18 @@ jobs:
 
       # Create GitHub Release when release PR is merged (no more pending changesets)
       - name: Create GitHub Release
+        id: create-release
         if: steps.changesets.outputs.hasChangesets == 'false'
         run: |
           VERSION=$(jq -r '.version' apps/dotco/package.json)
           NAME=$(jq -r '.name' apps/dotco/package.json)
           TAG="$NAME-v$VERSION"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
 
           # Skip if this version already has a release
           if gh release view "$TAG" &>/dev/null; then
             echo "Release $TAG already exists, skipping"
+            echo "created=false" >> $GITHUB_OUTPUT
             exit 0
           fi
 
@@ -65,12 +68,22 @@ jobs:
             CHANGELOG="Release $TAG"
           fi
 
+          # Use GITHUB_TOKEN for release creation (has contents:write permission)
           gh release create "$TAG" \
             --title "$TAG" \
             --notes "$CHANGELOG" \
             --target main
 
-          echo "Release $TAG created, triggering prod deploy..."
+          echo "created=true" >> $GITHUB_OUTPUT
+          echo "Release $TAG created"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Trigger prod deploy using App token (so workflow_dispatch actually triggers)
+      - name: Trigger Prod Deploy
+        if: steps.create-release.outputs.created == 'true'
+        run: |
+          echo "Triggering prod deploy for ${{ steps.create-release.outputs.tag }}..."
           gh workflow run deploy-dotco.yml -f environment=prod
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
