@@ -95,7 +95,7 @@ When PRs with changesets are merged to main, the release workflow automatically:
 When you merge the release PR:
 
 1. The release workflow detects no pending changesets
-2. Creates a GitHub Release with the new version tag
+2. Creates a GitHub Release with tag `{package-name}-v{version}` (e.g., `@able/dotco-v0.0.3`)
 3. The release triggers a production deployment
 
 ## Version Strategy

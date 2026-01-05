@@ -50,25 +50,27 @@ jobs:
         if: steps.changesets.outputs.hasChangesets == 'false'
         run: |
           VERSION=$(jq -r '.version' apps/dotco/package.json)
+          NAME=$(jq -r '.name' apps/dotco/package.json)
+          TAG="$NAME-v$VERSION"
 
           # Skip if this version already has a release
-          if gh release view "v$VERSION" &>/dev/null; then
-            echo "Release v$VERSION already exists, skipping"
+          if gh release view "$TAG" &>/dev/null; then
+            echo "Release $TAG already exists, skipping"
             exit 0
           fi
 
           # Extract changelog for this version (from ## $VERSION until next ## or EOF)
           CHANGELOG=$(awk "/^## ${VERSION}$/,/^## [0-9]/{if(/^## [0-9]/ && !/^## ${VERSION}$/)exit; print}" apps/dotco/CHANGELOG.md 2>/dev/null)
           if [ -z "$CHANGELOG" ]; then
-            CHANGELOG="Release v$VERSION"
+            CHANGELOG="Release $TAG"
           fi
 
-          gh release create "v$VERSION" \
-            --title "v$VERSION" \
+          gh release create "$TAG" \
+            --title "$TAG" \
             --notes "$CHANGELOG" \
             --target main
 
-          echo "Release v$VERSION created, triggering prod deploy..."
+          echo "Release $TAG created, triggering prod deploy..."
           gh workflow run deploy-dotco.yml -f environment=prod
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
