@@ -9,7 +9,7 @@
       },
     },
     "apps/dotco": {
-      "name": "@able/web",
+      "name": "@able/dotco",
       "version": "0.0.1",
       "dependencies": {
         "@able/ai": "*",
@@ -83,9 +83,9 @@
 
     "@able/db": ["@able/db@workspace:packages/db"],
 
-    "@able/ui": ["@able/ui@workspace:packages/ui"],
+    "@able/dotco": ["@able/dotco@workspace:apps/dotco"],
 
-    "@able/web": ["@able/web@workspace:apps/dotco"],
+    "@able/ui": ["@able/ui@workspace:packages/ui"],
 
     "@ai-sdk/anthropic": ["@ai-sdk/anthropic@1.2.12", "", { "dependencies": { "@ai-sdk/provider": "1.1.3", "@ai-sdk/provider-utils": "2.2.8" }, "peerDependencies": { "zod": "^3.0.0" } }, "sha512-YSzjlko7JvuiyQFmI9RN1tNZdEiZxc+6xld/0tq/VkJaHpEzGAb1yiNxxvmYVcjvfu/PcvCxAAYXmTYQQ63IHQ=="],
 
