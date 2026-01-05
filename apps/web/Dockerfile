@@ -1,10 +1,7 @@
-FROM oven/bun:1 AS base
+FROM node:20-slim AS base
 
-# Install Node.js for running Next.js build
-RUN apt-get update && apt-get install -y curl && \
-    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
-    apt-get install -y nodejs && \
-    rm -rf /var/lib/apt/lists/*
+# Install bun for package management
+RUN npm install -g bun
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -30,9 +27,9 @@ COPY . .
 # Build Next.js app
 ENV NEXT_TELEMETRY_DISABLED=1
 WORKDIR /app/apps/web
-# Use the installed next from node_modules, with Webpack instead of Turbopack
+# Symlink to root node_modules so packages resolve correctly
 RUN ln -s /app/node_modules ./node_modules && \
-    ./node_modules/.bin/next build
+    npx next build
 
 # Production image
 FROM base AS runner
@@ -55,4 +52,4 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["bun", "run", "server.js"]
+CMD ["node", "server.js"]
