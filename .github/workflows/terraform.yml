@@ -85,15 +85,19 @@ jobs:
         id: plan
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: |
-          set +e  # Disable errexit to capture exit code 2 (changes detected)
+          # Run terraform plan and capture both output and exit code
           terraform plan \
             -var-file=environments/shared.tfvars \
             -var-file=environments/${{ env.TF_ENVIRONMENT }}.tfvars \
             -detailed-exitcode \
             -out=tfplan \
-            -no-color 2>&1 | tee plan_output.txt
-          EXIT_CODE=${PIPESTATUS[0]}
-          set -e  # Re-enable errexit
+            -no-color > plan_output.txt 2>&1 || EXIT_CODE=$?
+
+          # Default to 0 if not set (plan succeeded with no changes)
+          EXIT_CODE=${EXIT_CODE:-0}
+
+          # Show plan output
+          cat plan_output.txt
 
           echo "Terraform plan exit code: $EXIT_CODE"
 
