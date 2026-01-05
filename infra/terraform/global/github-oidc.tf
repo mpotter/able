@@ -85,7 +85,8 @@ resource "aws_iam_role_policy" "github_actions" {
           "logs:*",
           "acm:*",
           "route53:*",
-          "route53domains:*"
+          "route53domains:*",
+          "kms:*"
         ]
         Resource = "*"
       }
