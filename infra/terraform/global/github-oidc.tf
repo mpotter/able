@@ -120,7 +120,7 @@ resource "aws_iam_role_policy" "github_actions" {
           "arn:aws:ecs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:task-definition/${var.project_name}-*:*"
         ]
       },
-      # ECS - list operations need broader access
+      # ECS - list operations and task definition management need broader access
       {
         Effect = "Allow"
         Action = [
@@ -128,7 +128,9 @@ resource "aws_iam_role_policy" "github_actions" {
           "ecs:ListServices",
           "ecs:ListTaskDefinitions",
           "ecs:ListTasks",
-          "ecs:DescribeTaskDefinition"
+          "ecs:DescribeTaskDefinition",
+          "ecs:RegisterTaskDefinition",
+          "ecs:DeregisterTaskDefinition"
         ]
         Resource = "*"
       },
